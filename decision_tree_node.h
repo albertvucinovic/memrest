@@ -1,3 +1,6 @@
+#ifndef DECISION_TREE_NODE_H
+#define DECISION_TREE_NODE_H
+
 #include <memory>
 #include <cstdlib>
 #include <set>
@@ -52,7 +55,7 @@ class DecisionTreeNode{
     }
 
     void update(shared_ptr<Sample<T>> sample){
-      N=samples->size();
+      int N=samples->size();
       if(is_leaf()){
         if(N<max_samples_to_hold){
           samples->push_back(sample);
@@ -65,7 +68,7 @@ class DecisionTreeNode{
         }
       }
       else{
-        if(criterion(*(sample->features)){
+        if(criterion(*(sample->features))){
           right->update(sample);
         }
         else{
@@ -74,6 +77,27 @@ class DecisionTreeNode{
       }
     }
 
+    shared_ptr<T> samples_matrix(){
+      T* temp=new T[samples->size()*number_of_decision_functions];
+      int k=0;
+      for(auto j=samples->begin();j!=samples->end();j++){
+        for(auto i=randomly_selected_features->begin();i!=randomly_selected_features->end();i++){
+          temp[k]=j->features[*i];
+          k++;
+        }
+      }
+      return shared_ptr<T>(temp);
+    }
+
+    shared_ptr<T> samples_prediction_vector(){
+      T* temp=new T[samples->size()];
+      for(auto i=samples->begin(),j=0;i!=samples->end();j++,i++){
+        temp[j]=i->prediction;
+      }
+      return shared_ptr<T>(temp);
+    }
+
+    //the overloaded function should freeze the node after splitting
     virtual void find_and_apply_best_split()=0; 
 
     virtual T predict(vector<T> sample)=0;
@@ -102,3 +126,5 @@ class DecisionTreeNode{
   private:
     
 };
+
+#endif //DECISION_TREE_NODE_H

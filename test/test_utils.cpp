@@ -57,8 +57,14 @@ int main(void){
   p.reset();
 
 
-  DecisionTreeNode<float> n(100,10,10,20);
+  //DecisionTreeNode<float> n(100,10,10,20,10);
 
+  shared_ptr<float> z(new float[5]);
+  float* pf=z.get();
+  *(pf+2)=3;
+  for(int i=0;i<5;i++){
+    cout<<pf[i]<<endl;
+  }
 
 
 
