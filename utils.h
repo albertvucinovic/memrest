@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <map>
 using namespace std;
 
 template<class T>
@@ -21,6 +22,22 @@ void print(vector<T> v){
     cout<<*i<<",";
   }
   cout<<"]"<<endl;
+}
+
+template<typename T>
+T gini(vector<T> v){
+  map<T,int> counts;
+  float total=(float)v.size();
+  for(auto i=v.begin();i!=v.end();i++){
+    //we are presuming that the default constructor for int sets the int to 0
+    counts[*i]++;
+  }
+  T res=1.;
+  for(auto i=count.begin();i!=counts.end();i++){
+    T t=i->second/total;
+    res-=t*t;
+  }
+  return res;
 }
 
 #endif//UTILS_H

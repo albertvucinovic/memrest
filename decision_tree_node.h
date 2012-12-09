@@ -31,7 +31,8 @@ class DecisionTreeNode{
       int number_of_decision_functions,
       int min_samples_to_split,
       int max_samples_to_hold,
-      int max_tree_depth
+      int max_tree_depth,
+      vector<shared_ptr<Sample<T>>> initial_samples=vector<shared_ptr<Sample<T>>>()
     ):
       number_of_features(number_of_features),
       number_of_decision_functions(number_of_decision_functions),

@@ -5,6 +5,7 @@
 #include <memory>
 #include <sample.h>
 #include <decision_tree_node.h>
+#include <map>
 using namespace std;
 
 class Proba{
@@ -66,6 +67,10 @@ int main(void){
     cout<<pf[i]<<endl;
   }
 
+  map<float,int> m;
+  m[2.]++;
+  cout<<"m[2.]="<<m[2.]<<endl;
+  
 
 
   print(c);
