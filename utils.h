@@ -1,3 +1,6 @@
+#ifndef UTILS_H
+#define UTILS_H
+
 #include <vector>
 #include <iostream>
 using namespace std;
@@ -19,3 +22,5 @@ void print(vector<T> v){
   }
   cout<<"]"<<endl;
 }
+
+#endif//UTILS_H
