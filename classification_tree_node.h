@@ -3,18 +3,41 @@
 
 #include <decision_tree_node.h>
 #include <utils.h>
+#include <sample.h>
+#include <memory>
 
-template<classT>
-class ClassificationTreeNode{
+template<class T>
+class ClassificationTreeNode:public DecisionTreeNode<T>{
   public:
+    ClassificationTreeNode(
+      int number_of_features,
+      int number_of_decision_functions,
+      int min_samples_to_split,
+      int max_samples_to_hold,
+      int max_tree_depth,
+      vector<shared_ptr<Sample<T>>> initial_samples=vector<shared_ptr<Sample<T>>>()
+    ):
+      DecisionTreeNode<T>(
+        number_of_features, 
+        number_of_decision_functions,
+        min_samples_to_split,
+        max_samples_to_hold,
+        max_tree_depth,
+        initial_samples)
+    {
+    }
+
+    ~ClassificationTreeNode(){
+    }
+
     T calculate_split_score(vector<T> left, vector<T> right){
       vector<T> my_predictions;
-      for(auto i=samples->begin();i!=samples.end();i++){
+      for(auto i=this->samples->begin();i!=this->samples->end();i++){
         my_predictions.push_back((*i)->prediction);
       }
-      T my_error=gini<T>(my_prediction);
-      left_gini=gini<t>(left);
-      right_gini=gini<T>(right);
+      T my_error=gini<T>(my_predictions);
+      T left_gini=gini<T>(left);
+      T right_gini=gini<T>(right);
       float total=(float)my_predictions.size();
       return my_error-1/total*(left_gini*left.size()+right_gini*right.size());
     }
@@ -24,17 +47,18 @@ class ClassificationTreeNode{
       T best_split_score=0;
       T best_split_threshold=0.;
       int best_split_feature=-1;
-      vector<shared_ptr<Sample<T>> best_split_left;
-      vector<shared_ptr<Sample<T>> best_split_right;
-      for(auto s=samples->begin();s!=samples->end();s++){
-        for(auto f=randomly_selected_features->begin();f!=randomly_selected_features->end();f++){
-          T threshold=(*s)->features[*f];
-          vector<shared_ptr<Sample<T>> left_samples;
+      vector<shared_ptr<Sample<T>>> best_split_left;
+      vector<shared_ptr<Sample<T>>> best_split_right;
+      for(auto s=this->samples->begin();s!=this->samples->end();s++){
+        for(auto f=this->randomly_selected_features->begin();f!=this->randomly_selected_features->end();f++){
+          vector<T> v=(*s)->features;
+          T threshold=v[*f];
+          vector<shared_ptr<Sample<T>>> left_samples;
           vector<T> left;
-          vector<shared_ptr<Sample<T>> right_samples;
+          vector<shared_ptr<Sample<T>>> right_samples;
           vector<T> right;
-          for(auto s1=samples->begin();s1!=samples->end();s1++){
-            if((*s)->features[*f]>threshold){
+          for(auto s1=this->samples->begin();s1!=this->samples->end();s1++){
+            if(((*s)->features[*f])>threshold){
               right.push_back((*s1)->prediction);
               right_samples.push_back(*s1);
             }
@@ -55,32 +79,44 @@ class ClassificationTreeNode{
       }
       //apply the best split
       if(best_split_score>0.){
-        criterion_feature=best_split_feature;
-        criterion_threshold=best_split_threshold;
-        left=reset(
+        this->criterion_feature=best_split_feature;
+        this->criterion_threshold=best_split_threshold;
+        this->left.reset(
           new ClassificationTreeNode<T>(
-            number_of_features,
-            number_of_decision_functions,
-            min_samples_to_split,
-            max_samples_to_hold,
-            max_tree_depth,
+            this->number_of_features,
+            this->number_of_decision_functions,
+            this->min_samples_to_split,
+            this->max_samples_to_hold,
+            this->max_tree_depth,
             best_split_left)
-        )
-        right=reset(
+        );
+        this->right.reset(
           new ClassificationTreeNode<T>(
-            number_of_features,
-            number_of_decision_functions,
-            min_samples_to_split,
-            max_samples_to_hold,
-            max_tree_depth,
+            this->number_of_features,
+            this->number_of_decision_functions,
+            this->min_samples_to_split,
+            this->max_samples_to_hold,
+            this->max_tree_depth,
             best_split_right)
-        )
+        );
         //free some memory if possible
-        samples.reset();
-        randomly_selected_features.reset();
+        this->samples.reset();
+        this->randomly_selected_features.reset();
       }
     }
-}
+
+    virtual T predict(vector<T> sample){
+      return 0.;
+    }
+
+    virtual T update_oob(shared_ptr<Sample<T>> sample){
+      return 0.;
+    }
+
+    virtual void freeze_prediction(){
+      
+    }
+};
 
 
 #endif //CLASSIFICATION_TREE_NODE_H

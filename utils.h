@@ -33,7 +33,7 @@ T gini(vector<T> v){
     counts[*i]++;
   }
   T res=1.;
-  for(auto i=count.begin();i!=counts.end();i++){
+  for(auto i=counts.begin();i!=counts.end();i++){
     T t=i->second/total;
     res-=t*t;
   }

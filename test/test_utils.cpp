@@ -4,7 +4,7 @@
 #include <cassert>
 #include <memory>
 #include <sample.h>
-#include <decision_tree_node.h>
+#include <classification_tree_node.h>
 #include <map>
 using namespace std;
 
@@ -22,6 +22,13 @@ void f(){
   p.reset();
 }
 
+void test_classification_tree_node(){
+
+  //DecisionTreeNode<float> n(100,10,10,20,10);
+  vector<shared_ptr<Sample<float>>> initial_samples;
+  ClassificationTreeNode<float> n(100,10,10,20,10,initial_samples);
+}
+
 
 int main(void){
 
@@ -34,9 +41,9 @@ int main(void){
   vector<float> d {3,4,9.2};
   assert(d==c);
 
-  shared_ptr<Sample<float>> s(new Sample<float>(new vector<float> {1,2,3}, 5));
+  shared_ptr<Sample<float>> s(new Sample<float>(vector<float> {1,2,3}, 5));
   
-  print(*(s->features));
+  print(s->features);
   cout<<"Prediction is: "<<s->prediction<<endl;
 
   shared_ptr<Sample<float>> sp(s);
@@ -58,7 +65,6 @@ int main(void){
   p.reset();
 
 
-  //DecisionTreeNode<float> n(100,10,10,20,10);
 
   shared_ptr<float> z(new float[5]);
   float* pf=z.get();
@@ -74,5 +80,7 @@ int main(void){
 
 
   print(c);
+
+  test_classification_tree_node();
   
 }
