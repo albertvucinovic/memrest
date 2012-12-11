@@ -29,22 +29,12 @@ void test_classification_tree_node(){
   ClassificationTreeNode<float> n(100,10,10,20,10,initial_samples);
 }
 
-
-int main(void){
-
-  cout<<"Ovo je proba!"<<endl;
-
-  vector<float> a {3,1,4,1,5,9.2,2,6,5,4};
-  vector<int> b {0,2,5};
-
-  vector<float> c=subsample(a,b);
-  vector<float> d {3,4,9.2};
-  assert(d==c);
-
+void test_shared_pointer(){
   shared_ptr<Sample<float>> s(new Sample<float>(vector<float> {1,2,3}, 5));
   
   print(s->features);
   cout<<"Prediction is: "<<s->prediction<<endl;
+
 
   shared_ptr<Sample<float>> sp(s);
   cout<<"1"<<endl;
@@ -73,14 +63,38 @@ int main(void){
     cout<<pf[i]<<endl;
   }
 
+}
+
+void test_subsample(){
+  vector<float> a {3,1,4,1,5,9.2,2,6,5,4};
+  vector<int> b {0,2,5};
+
+  vector<float> c=subsample(a,b);
+  vector<float> d {3,4,9.2};
+  assert(d==c);
+
+}
+
+void test_map(){
   map<float,int> m;
   m[2.]++;
   cout<<"m[2.]="<<m[2.]<<endl;
-  
+}
 
+void test(void (*f)(), string name){
+  cout<<"Testing "<<name<<endl;
+  f();
+  cout<<"Testing "<<name<<" finished."<<endl<<endl;
+}
 
-  print(c);
+int main(void){
 
-  test_classification_tree_node();
+  test(&test_subsample, "subsample");
+
+  test(&test_shared_pointer, "shared pointer");
+
+  test(&test_map, "map");
+
+  test(&test_classification_tree_node, "classification tree node");
   
 }
