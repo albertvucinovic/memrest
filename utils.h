@@ -59,6 +59,17 @@ T argmaxcount(vector<T> v){
   }
   return max_element;
 }
+
+template<typename T>
+T count(vector<T> v, T el){
+  T c=0;
+  for(auto i=v.begin();i!=v.end();i++){
+    if(*i==el) c+=1;
+  }
+  return c;
+}
+
+
 }
 
 #endif//UTILS_H
