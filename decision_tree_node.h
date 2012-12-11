@@ -30,6 +30,7 @@ class DecisionTreeNode{
     T frozen_prediction_probability;
     bool prediction_frozen=false;
 
+
     DecisionTreeNode(
       int number_of_features,
       int number_of_decision_functions,
@@ -117,8 +118,6 @@ class DecisionTreeNode{
 
     virtual T predict(vector<T> sample)=0;
 
-    virtual T update_oob(shared_ptr<Sample<T>> sample)=0;
-    
     virtual void freeze_prediction()=0;
 
     //Releases its shared pointers for samples, and sets up the node to predict the learned value

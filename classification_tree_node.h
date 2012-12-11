@@ -131,11 +131,6 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
       }
     }
 
-    virtual T update_oob(shared_ptr<Sample<T>> sample){
-      //TODO
-      return 0.;
-    }
-
     virtual void freeze_prediction(){
       this->frozen_prediction=node_prediction();
       //TODO:implement probabilities
