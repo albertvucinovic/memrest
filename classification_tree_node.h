@@ -134,7 +134,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
     virtual void freeze_prediction(){
       this->frozen_prediction=node_prediction();
       vector<T> predictions=this->samples_prediction_vector();
-      this->frozen_prediction_probability=utils::count<T>(predictions, this->frozen_prediction)/
+      this->frozen_prediction_probability=utils::count(predictions, this->frozen_prediction)/
         ((float)predictions.size());
       this->prediction_frozen=true;
     }
