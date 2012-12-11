@@ -26,6 +26,10 @@ class DecisionTreeNode{
     int criterion_feature;
     T criterion_threshold;
 
+    T frozen_prediction;
+    T frozen_prediction_probability;
+    bool prediction_frozen=false;
+
     DecisionTreeNode(
       int number_of_features,
       int number_of_decision_functions,
@@ -56,16 +60,18 @@ class DecisionTreeNode{
     }
 
     void update(shared_ptr<Sample<T>> sample){
-      int N=samples->size();
       if(is_leaf()){
-        if(N<max_samples_to_hold){
-          samples->push_back(sample);
-          if((N+1)%min_samples_to_split==0 && max_tree_depth>0){
-            find_and_apply_best_split();
+        if(!prediction_frozen){
+          int N=samples->size();
+          if(N<max_samples_to_hold){
+            samples->push_back(sample);
+            if((N+1)%min_samples_to_split==0 && max_tree_depth>0){
+              find_and_apply_best_split();
+            }
           }
-        }
-        else{
-          freeze();
+          else{
+            freeze();
+          }
         }
       }
       else{
@@ -90,12 +96,20 @@ class DecisionTreeNode{
       return shared_ptr<T>(temp);
     }
 
-    shared_ptr<T> samples_prediction_vector(){
+    shared_ptr<T> samples_prediction_array(){
       T* temp=new T[samples->size()];
       for(auto i=samples->begin(),j=0;i!=samples->end();j++,i++){
         temp[j]=i->prediction;
       }
       return shared_ptr<T>(temp);
+    }
+
+    vector<T> samples_prediction_vector(){
+      vector<T> temp;
+      for(auto i=samples->begin();i!=samples->end();i++){
+        temp.push_back((*i)->prediction);
+      }
+      return temp;
     }
 
     //the overloaded function should freeze the node after splitting

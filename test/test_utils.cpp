@@ -81,11 +81,25 @@ void test_map(){
   cout<<"m[2.]="<<m[2.]<<endl;
 }
 
+void test_gini(){
+  vector<float> v {1,2,2,2};
+  float g=gini(v);
+  cout<<"Gini is "<<g<<endl;
+  assert(g==0.375);
+}
+
+void test_argmaxcount(){
+  vector<float> v{1,2,3,2};
+  assert(argmaxcount<float>(v)==2);
+}
+
+
 void test(void (*f)(), string name){
   cout<<"Testing "<<name<<endl;
   f();
   cout<<"Testing "<<name<<" finished."<<endl<<endl;
 }
+
 
 int main(void){
 
@@ -96,5 +110,9 @@ int main(void){
   test(&test_map, "map");
 
   test(&test_classification_tree_node, "classification tree node");
+
+  test(&test_gini, "gini");
+
+  test(&test_argmaxcount, "argmaxcount");
   
 }

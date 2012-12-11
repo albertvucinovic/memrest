@@ -105,16 +105,42 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
       }
     }
 
+    T node_prediction(){
+      if(this->samples->size()>0){
+        return argmaxcount(this->samples_prediction_vector());
+      }
+      else if(this->prediction_frozen){
+        return this->frozen_prediction;
+      }
+      else{
+        return 0./0.;//a NaN
+      }
+    }
+
     virtual T predict(vector<T> sample){
-      return 0.;
+      if(this->is_leaf()){
+        return node_prediction();
+      }
+      else{
+        if(this->criterion(sample)){
+          return this->right->predict(sample);
+        }
+        else{
+          return this->left->predict(sample);
+        }
+      }
     }
 
     virtual T update_oob(shared_ptr<Sample<T>> sample){
+      //TODO
       return 0.;
     }
 
     virtual void freeze_prediction(){
-      
+      this->frozen_prediction=node_prediction();
+      //TODO:implement probabilities
+      this->frozen_prediction_probability=1.;
+      this->prediction_frozen=true;
     }
 };
 
