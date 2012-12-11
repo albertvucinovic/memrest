@@ -8,6 +8,13 @@
 #include <map>
 using namespace std;
 
+void test(void (*f)(), string name){
+  cout<<"Testing "<<name<<endl;
+  f();
+  cout<<"Testing "<<name<<" finished."<<endl<<endl;
+}
+
+
 class Proba{
 public:
   Proba(){}
@@ -20,13 +27,6 @@ void f(){
   unique_ptr<Proba> p(new Proba);
   p.reset();
   p.reset();
-}
-
-void test_classification_tree_node(){
-
-  //DecisionTreeNode<float> n(100,10,10,20,10);
-  vector<shared_ptr<Sample<float>>> initial_samples;
-  ClassificationTreeNode<float> n(100,10,10,20,10,initial_samples);
 }
 
 void test_shared_pointer(){
@@ -93,12 +93,16 @@ void test_argmaxcount(){
   assert(utils::argmaxcount<float>(v)==2);
 }
 
+void test_classification_tree_node(){
 
-void test(void (*f)(), string name){
-  cout<<"Testing "<<name<<endl;
-  f();
-  cout<<"Testing "<<name<<" finished."<<endl<<endl;
+  //DecisionTreeNode<float> n(100,10,10,20,10);
+  vector<shared_ptr<Sample<float>>> initial_samples;
+  ClassificationTreeNode<float> n(100,10,10,20,10,initial_samples);
 }
+
+
+
+
 
 
 int main(void){

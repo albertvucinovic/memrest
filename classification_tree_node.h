@@ -106,11 +106,11 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
     }
 
     T node_prediction(){
-      if(this->samples->size()>0){
-        return utils::argmaxcount(this->samples_prediction_vector());
-      }
-      else if(this->prediction_frozen){
+      if(this->prediction_frozen){
         return this->frozen_prediction;
+      }
+      else if(this->samples->size()>0){
+        return utils::argmaxcount(this->samples_prediction_vector());
       }
       else{
         return 0./0.;//a NaN
