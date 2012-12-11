@@ -35,9 +35,9 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
       for(auto i=this->samples->begin();i!=this->samples->end();i++){
         my_predictions.push_back((*i)->prediction);
       }
-      T my_error=gini<T>(my_predictions);
-      T left_gini=gini<T>(left);
-      T right_gini=gini<T>(right);
+      T my_error=utils::gini(my_predictions);
+      T left_gini=utils::gini(left);
+      T right_gini=utils::gini(right);
       float total=(float)my_predictions.size();
       return my_error-1/total*(left_gini*left.size()+right_gini*right.size());
     }
@@ -107,7 +107,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
 
     T node_prediction(){
       if(this->samples->size()>0){
-        return argmaxcount(this->samples_prediction_vector());
+        return utils::argmaxcount(this->samples_prediction_vector());
       }
       else if(this->prediction_frozen){
         return this->frozen_prediction;

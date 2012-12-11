@@ -32,7 +32,7 @@ void test_classification_tree_node(){
 void test_shared_pointer(){
   shared_ptr<Sample<float>> s(new Sample<float>(vector<float> {1,2,3}, 5));
   
-  print(s->features);
+  utils::print(s->features);
   cout<<"Prediction is: "<<s->prediction<<endl;
 
 
@@ -69,7 +69,7 @@ void test_subsample(){
   vector<float> a {3,1,4,1,5,9.2,2,6,5,4};
   vector<int> b {0,2,5};
 
-  vector<float> c=subsample(a,b);
+  vector<float> c=utils::subsample(a,b);
   vector<float> d {3,4,9.2};
   assert(d==c);
 
@@ -83,14 +83,14 @@ void test_map(){
 
 void test_gini(){
   vector<float> v {1,2,2,2};
-  float g=gini(v);
+  float g=utils::gini(v);
   cout<<"Gini is "<<g<<endl;
   assert(g==0.375);
 }
 
 void test_argmaxcount(){
   vector<float> v{1,2,3,2};
-  assert(argmaxcount<float>(v)==2);
+  assert(utils::argmaxcount<float>(v)==2);
 }
 
 

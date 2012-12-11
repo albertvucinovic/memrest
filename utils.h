@@ -5,7 +5,7 @@
 #include <iostream>
 #include <map>
 using namespace std;
-
+namespace utils{
 template<class T>
 vector<T> subsample(vector<T> v, vector<int> indices){
   vector<T> temp;
@@ -58,6 +58,7 @@ T argmaxcount(vector<T> v){
     }
   }
   return max_element;
+}
 }
 
 #endif//UTILS_H
