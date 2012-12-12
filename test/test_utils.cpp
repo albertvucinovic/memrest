@@ -2,6 +2,7 @@
 #include <sample.h>
 #include <classification_tree_node.h>
 #include <online_random_forest_classifier.h>
+#include "data.h"
 
 #include <iostream>
 #include <vector>
@@ -128,6 +129,11 @@ void test_classification_tree_node(){
 void test_online_random_forest(){
   OnlineRandomForestClassifier<float, ClassificationTreeNode<float>> rf(
     10,10,5,5,10,10);
+  vector<shared_ptr<Sample<float>>> data=read_svm_data<float>("../../forex/data/libsvm/dna.scale");
+  for(auto i=data.begin();i!=data.end();i++){
+    utils::print((*i)->features);
+    cout<<endl<<"Prediction:"<<(*i)->prediction<<endl;
+  }
 }
 
 
