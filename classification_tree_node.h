@@ -4,6 +4,7 @@
 #include <decision_tree_node.h>
 #include <utils.h>
 #include <sample.h>
+#include <split.h>
 
 #include <utility>
 #include <memory>
@@ -44,7 +45,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
       return my_error-1/total*(left_gini*left.size()+right_gini*right.size());
     }
 
-    virtual void find_and_apply_best_split(){
+    virtual Split<T> find_best_split(){
       //find the best split
       T best_split_score=0;
       T best_split_threshold=0.;
@@ -79,10 +80,15 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
           }
         }
       }
+      return Split<T>(best_split_threshold, best_split_feature, best_split_left, best_split_right, best_split_score);
+    }
+
+    void find_and_apply_best_split(){
+      Split<T> split=find_best_split();
       //apply the best split
-      if(best_split_score>0.){
-        this->criterion_feature=best_split_feature;
-        this->criterion_threshold=best_split_threshold;
+      if(split.score>0.){
+        this->criterion_feature=split.feature;
+        this->criterion_threshold=split.threshold;
         this->left.reset(
           new ClassificationTreeNode<T>(
             this->number_of_features,
@@ -90,7 +96,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
             this->min_samples_to_split,
             this->max_samples_to_hold,
             this->max_tree_depth,
-            best_split_left)
+            split.left)
         );
         this->right.reset(
           new ClassificationTreeNode<T>(
@@ -99,7 +105,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
             this->min_samples_to_split,
             this->max_samples_to_hold,
             this->max_tree_depth,
-            best_split_right)
+            split.right)
         );
         //free some memory if possible
         this->collect_memory();

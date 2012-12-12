@@ -1,6 +1,9 @@
 #ifndef DECISION_TREE_NODE_H
 #define DECISION_TREE_NODE_H
 
+#include <sample.h>
+#include <split.h>
+
 #include <memory>
 #include <cstdlib>
 #include <set>
