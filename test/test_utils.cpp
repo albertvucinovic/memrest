@@ -108,9 +108,17 @@ void test_classification_tree_node(){
   p=n.predict(t).first;
   cout<<p<<endl;
   assert(p==5);
+  n.update(s);
 
   vector<float> t1{1,3,3,4,5};
   assert(n.predict(t1).first==5);
+  shared_ptr<Sample<float>> s1(new Sample<float>(t, 3));
+  n.update(s1);
+  assert(n.predict(t1).first==5);
+  n.update(s1);
+  n.update(s1);
+  assert(n.predict(t1).first==3);
+
 
 
 }
