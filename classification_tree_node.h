@@ -107,10 +107,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
     }
 
     pair<T,T> node_prediction(){
-      if(this->prediction_frozen){
-        return this->frozen_prediction;
-      }
-      else if(this->samples->size()>0){
+      if(this->samples->size()>0){
         vector<T> spv=this->samples_prediction_vector();
         T prediction=utils::argmaxcount(spv);
         T probability=utils::count(spv, prediction)/((float)spv.size());

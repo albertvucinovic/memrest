@@ -71,7 +71,7 @@ class DecisionTreeNode{
             }
           }
           else{
-            this->freeze();
+            this->freeze_prediction();
           }
         }
       }
@@ -119,6 +119,9 @@ class DecisionTreeNode{
     virtual pair<T,T> node_prediction()=0;
 
     pair<T,T> predict(vector<T> sample){
+      if(this->prediction_frozen){
+        return this->frozen_prediction;
+      }
       if(this->is_leaf()){
         return node_prediction();
       }
@@ -138,7 +141,7 @@ class DecisionTreeNode{
     }
     
     //Releases its shared pointers for samples, and sets up the node to predict the learned value
-    void freeze(){
+    void freeze_prediction(){
       pair<T,T> prediction=node_prediction();
       this->frozen_prediction=node_prediction();
       this->prediction_frozen=true;
