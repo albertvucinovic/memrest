@@ -1,1 +1,14 @@
-Test everything out.
+Set up a data testing environment similar to the one used in python (with the same data).
+Create A OnlineRandomForestClassifier class with bad oob error tree droping.
+Test The OnlineRandomForestClassifier class.
+Create ClassificationTreeNodeOpenCL.
+Create OnlineRandomForestClassifierOpenCL.
+Test OnlineRandomForestClassifierOpenCL.
+Create RegressionTreeNode class.
+Create OnlineRandomForestRegressor.
+Test OnlineRandomForestRegressor.
+Create RegressionTreeNodeOpenCL.
+Create OnlineRandomForestRegressorOpenCL.
+Test OnlineRandomForestRegressorOpenCL.
+
+

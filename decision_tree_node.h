@@ -11,7 +11,7 @@
 using namespace std;
 
 //T should be float or double
-template <class T>
+template <class T, class Node>
 class DecisionTreeNode{
   public:
     int number_of_features;
@@ -22,8 +22,8 @@ class DecisionTreeNode{
     int max_tree_depth;
     unique_ptr<vector<shared_ptr<Sample<T>>>> samples;
 
-    unique_ptr<DecisionTreeNode<T>> left;
-    unique_ptr<DecisionTreeNode<T>> right;
+    unique_ptr<DecisionTreeNode<T,Node>> left;
+    unique_ptr<DecisionTreeNode<T,Node>> right;
 
     unique_ptr<vector<int>> randomly_selected_features;
 
@@ -116,8 +116,36 @@ class DecisionTreeNode{
       return temp;
     }
 
-    //the overloaded function should collect_memory the node after splitting
-    virtual void find_and_apply_best_split()=0; 
+    virtual Split<T> find_best_split()=0;
+
+    void find_and_apply_best_split(){
+      Split<T> split=this->find_best_split();
+      //apply the best split
+      if(split.score>0.){
+        this->criterion_feature=split.feature;
+        this->criterion_threshold=split.threshold;
+        this->left.reset(
+          new Node(
+            this->number_of_features,
+            this->number_of_decision_functions,
+            this->min_samples_to_split,
+            this->max_samples_to_hold,
+            this->max_tree_depth,
+            split.left)
+        );
+        this->right.reset(
+          new Node(
+            this->number_of_features,
+            this->number_of_decision_functions,
+            this->min_samples_to_split,
+            this->max_samples_to_hold,
+            this->max_tree_depth,
+            split.right)
+        );
+        //free some memory if possible
+        this->collect_memory();
+      }
+    }
 
     virtual pair<T,T> node_prediction()=0;
 

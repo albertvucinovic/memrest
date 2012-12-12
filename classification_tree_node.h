@@ -10,7 +10,7 @@
 #include <memory>
 
 template<class T>
-class ClassificationTreeNode:public DecisionTreeNode<T>{
+class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T>>{
   public:
     ClassificationTreeNode(
       int number_of_features,
@@ -20,7 +20,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
       int max_tree_depth,
       vector<shared_ptr<Sample<T>>> initial_samples=vector<shared_ptr<Sample<T>>>()
     ):
-      DecisionTreeNode<T>(
+      DecisionTreeNode<T, ClassificationTreeNode<T>>(
         number_of_features, 
         number_of_decision_functions,
         min_samples_to_split,
@@ -81,35 +81,6 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
         }
       }
       return Split<T>(best_split_threshold, best_split_feature, best_split_left, best_split_right, best_split_score);
-    }
-
-    void find_and_apply_best_split(){
-      Split<T> split=find_best_split();
-      //apply the best split
-      if(split.score>0.){
-        this->criterion_feature=split.feature;
-        this->criterion_threshold=split.threshold;
-        this->left.reset(
-          new ClassificationTreeNode<T>(
-            this->number_of_features,
-            this->number_of_decision_functions,
-            this->min_samples_to_split,
-            this->max_samples_to_hold,
-            this->max_tree_depth,
-            split.left)
-        );
-        this->right.reset(
-          new ClassificationTreeNode<T>(
-            this->number_of_features,
-            this->number_of_decision_functions,
-            this->min_samples_to_split,
-            this->max_samples_to_hold,
-            this->max_tree_depth,
-            split.right)
-        );
-        //free some memory if possible
-        this->collect_memory();
-      }
     }
 
     pair<T,T> node_prediction(){
