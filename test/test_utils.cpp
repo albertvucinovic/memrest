@@ -97,7 +97,22 @@ void test_classification_tree_node(){
 
   //DecisionTreeNode<float> n(100,10,10,20,10);
   vector<shared_ptr<Sample<float>>> initial_samples;
-  ClassificationTreeNode<float> n(100,10,10,20,10,initial_samples);
+  ClassificationTreeNode<float> n(5,2,3,6,3,initial_samples);
+  vector<float> t{1,2,3,4,5};
+  float p=n.predict(t).first;
+  cout<<p<<endl;
+  assert(p!=p);//testing for nan
+
+  shared_ptr<Sample<float>> s(new Sample<float>(t, 5));
+  n.update(s);
+  p=n.predict(t).first;
+  cout<<p<<endl;
+  assert(p==5);
+
+  vector<float> t1{1,3,3,4,5};
+  assert(n.predict(t1).first==5);
+
+
 }
 
 
@@ -113,10 +128,10 @@ int main(void){
 
   test(&test_map, "map");
 
-  test(&test_classification_tree_node, "classification tree node");
-
   test(&test_gini, "gini");
 
   test(&test_argmaxcount, "argmaxcount");
+
+  test(&test_classification_tree_node, "classification tree node");
   
 }

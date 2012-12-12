@@ -4,6 +4,7 @@
 #include <memory>
 #include <cstdlib>
 #include <set>
+#include <utility>
 using namespace std;
 
 //T should be float or double
@@ -26,8 +27,7 @@ class DecisionTreeNode{
     int criterion_feature;
     T criterion_threshold;
 
-    T frozen_prediction;
-    T frozen_prediction_probability;
+    pair<T,T> frozen_prediction;
     bool prediction_frozen=false;
 
 
@@ -46,7 +46,7 @@ class DecisionTreeNode{
       max_tree_depth(max_tree_depth)
     {
       samples.reset(new vector<shared_ptr<Sample<T>>>());
-      randomly_select_decision_functions();
+      this->randomly_select_decision_functions();
     }
 
     ~DecisionTreeNode(){
@@ -67,16 +67,16 @@ class DecisionTreeNode{
           if(N<max_samples_to_hold){
             samples->push_back(sample);
             if((N+1)%min_samples_to_split==0 && max_tree_depth>0){
-              find_and_apply_best_split();
+              this->find_and_apply_best_split();
             }
           }
           else{
-            freeze();
+            this->freeze();
           }
         }
       }
       else{
-        if(criterion(*(sample->features))){
+        if(criterion(sample->features)){
           right->update(sample);
         }
         else{
@@ -116,7 +116,7 @@ class DecisionTreeNode{
     //the overloaded function should freeze the node after splitting
     virtual void find_and_apply_best_split()=0; 
 
-    virtual T predict(vector<T> sample)=0;
+    virtual pair<T,T> predict(vector<T> sample)=0;
 
     virtual void freeze_prediction()=0;
 

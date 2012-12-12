@@ -4,6 +4,8 @@
 #include <decision_tree_node.h>
 #include <utils.h>
 #include <sample.h>
+
+#include <utility>
 #include <memory>
 
 template<class T>
@@ -105,19 +107,22 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
       }
     }
 
-    T node_prediction(){
+    pair<T,T> node_prediction(){
       if(this->prediction_frozen){
         return this->frozen_prediction;
       }
       else if(this->samples->size()>0){
-        return utils::argmaxcount(this->samples_prediction_vector());
+        vector<T> spv=this->samples_prediction_vector();
+        T prediction=utils::argmaxcount(spv);
+        T probability=utils::count(spv, prediction)/((float)spv.size());
+        return pair<T,T>(prediction, probability);
       }
       else{
-        return 0./0.;//a NaN
+        return pair<T,T>(0./0., 0.);//a NaN
       }
     }
 
-    virtual T predict(vector<T> sample){
+    virtual pair<T,T> predict(vector<T> sample){
       if(this->is_leaf()){
         return node_prediction();
       }
@@ -132,10 +137,8 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
     }
 
     virtual void freeze_prediction(){
+      pair<T,T> prediction=node_prediction();
       this->frozen_prediction=node_prediction();
-      vector<T> predictions=this->samples_prediction_vector();
-      this->frozen_prediction_probability=utils::count(predictions, this->frozen_prediction)/
-        ((float)predictions.size());
       this->prediction_frozen=true;
     }
 };
