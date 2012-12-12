@@ -102,8 +102,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
             best_split_right)
         );
         //free some memory if possible
-        this->samples.reset();
-        this->randomly_selected_features.reset();
+        this->collect_memory();
       }
     }
 
@@ -121,26 +120,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T>{
         return pair<T,T>(0./0., 0.);//a NaN
       }
     }
-
-    virtual pair<T,T> predict(vector<T> sample){
-      if(this->is_leaf()){
-        return node_prediction();
-      }
-      else{
-        if(this->criterion(sample)){
-          return this->right->predict(sample);
-        }
-        else{
-          return this->left->predict(sample);
-        }
-      }
-    }
-
-    virtual void freeze_prediction(){
-      pair<T,T> prediction=node_prediction();
-      this->frozen_prediction=node_prediction();
-      this->prediction_frozen=true;
-    }
+    
 };
 
 

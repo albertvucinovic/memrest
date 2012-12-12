@@ -113,18 +113,36 @@ class DecisionTreeNode{
       return temp;
     }
 
-    //the overloaded function should freeze the node after splitting
+    //the overloaded function should collect_memory the node after splitting
     virtual void find_and_apply_best_split()=0; 
 
-    virtual pair<T,T> predict(vector<T> sample)=0;
+    virtual pair<T,T> node_prediction()=0;
 
-    virtual void freeze_prediction()=0;
+    pair<T,T> predict(vector<T> sample){
+      if(this->is_leaf()){
+        return node_prediction();
+      }
+      else{
+        if(this->criterion(sample)){
+          return this->right->predict(sample);
+        }
+        else{
+          return this->left->predict(sample);
+        }
+      }
+    }
 
-    //Releases its shared pointers for samples, and sets up the node to predict the learned value
-    void freeze(){
-      freeze_prediction();
+    void collect_memory(){
       samples.reset();
       randomly_selected_features.reset();
+    }
+    
+    //Releases its shared pointers for samples, and sets up the node to predict the learned value
+    void freeze(){
+      pair<T,T> prediction=node_prediction();
+      this->frozen_prediction=node_prediction();
+      this->prediction_frozen=true;
+      this->collect_memory();
     }
   protected:
     void randomly_select_decision_functions(){
