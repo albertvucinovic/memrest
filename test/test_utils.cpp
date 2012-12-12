@@ -1,10 +1,12 @@
-#include <iostream>
 #include <utils.h>
+#include <sample.h>
+#include <classification_tree_node.h>
+#include <online_random_forest_classifier.h>
+
+#include <iostream>
 #include <vector>
 #include <cassert>
 #include <memory>
-#include <sample.h>
-#include <classification_tree_node.h>
 #include <map>
 using namespace std;
 
@@ -123,6 +125,11 @@ void test_classification_tree_node(){
 
 }
 
+void test_online_random_forest(){
+  OnlineRandomForestClassifier<float, ClassificationTreeNode<float>> rf(
+    10,10,5,5,10,10);
+}
+
 
 
 
@@ -141,5 +148,7 @@ int main(void){
   test(&test_argmaxcount, "argmaxcount");
 
   test(&test_classification_tree_node, "classification tree node");
+
+  test(&test_online_random_forest, "test_online_random_forest");
   
 }
