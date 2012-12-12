@@ -116,7 +116,6 @@ class DecisionTreeNode{
       return temp;
     }
 
-    virtual Split<T> find_best_split()=0;
 
     void find_and_apply_best_split(){
       Split<T> split=this->find_best_split();
@@ -147,9 +146,8 @@ class DecisionTreeNode{
       }
     }
 
-    virtual pair<T,T> node_prediction()=0;
 
-    pair<T,T> predict(vector<T> sample){
+    pair<T,T> predict(vector<T>& sample){
       if(this->prediction_frozen){
         return this->frozen_prediction;
       }
@@ -178,6 +176,12 @@ class DecisionTreeNode{
       this->prediction_frozen=true;
       this->collect_memory();
     }
+
+
+    virtual Split<T> find_best_split()=0;
+
+    virtual pair<T,T> node_prediction()=0;
+
   protected:
     void randomly_select_decision_functions(){
       set<int> selected;
