@@ -131,7 +131,7 @@ void test_online_random_forest(){
   shared_ptr<Sample<float>> first_data=*(data.begin());
   int num_features=first_data->features.size();
   OnlineRandomForestClassifier<float, ClassificationTreeNode<float>> rf(
-    1,
+    1000,
     num_features,
     num_features/2,
     10, //min split samples
@@ -143,6 +143,7 @@ void test_online_random_forest(){
   //  cout<<endl<<"Prediction:"<<(*i)->prediction<<endl;
     rf.update(*i);
   }
+  //TODO: test with the test set
 
 }
 

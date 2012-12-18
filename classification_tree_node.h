@@ -55,7 +55,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
 
     virtual Split<T> find_best_split(){
       //find the best split
-      cout<<"Finding best split"<<endl;
+      DEBUG1(cout<<"Finding best split"<<endl);
       T best_split_score=0;
       T best_split_threshold=0.;
       int best_split_feature=-1;
@@ -91,7 +91,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
           }
         }
       }
-      cout<<"best split score:"<<best_split_score<<endl;
+      DEBUG1(cout<<"best split score:"<<best_split_score<<endl);
       return Split<T>(best_split_threshold, best_split_feature, best_split_left, best_split_right, best_split_score);
     }
 

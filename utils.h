@@ -1,6 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#define DEBUG_LEVEL 1
+
+#define DEBUG1(T) if( DEBUG_LEVEL >=1) T;
+
 #include <vector>
 #include <iostream>
 #include <map>
