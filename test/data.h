@@ -30,7 +30,6 @@ vector<shared_ptr<Sample<T>>> read_svm_data(string filename){
       iss2>>feature;
       iss2>>column;
       iss2>>value;
-      cout<<feature<<" : "<<value<<endl;
       if(feature>max_feature){
         max_feature=feature;
       }

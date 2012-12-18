@@ -31,7 +31,7 @@ class DecisionTreeNode{
     T criterion_threshold;
 
     pair<T,T> frozen_prediction;
-    bool prediction_frozen=false;
+    bool prediction_frozen;
 
 
     DecisionTreeNode(
@@ -50,6 +50,7 @@ class DecisionTreeNode{
     {
       samples.reset(new vector<shared_ptr<Sample<T>>>());
       this->randomly_select_decision_functions();
+      this->prediction_frozen=false;
     }
 
     ~DecisionTreeNode(){
@@ -65,10 +66,17 @@ class DecisionTreeNode{
 
     void update(shared_ptr<Sample<T>> sample){
       if(is_leaf()){
+        cout<<prediction_frozen<<false<<endl;
         if(!prediction_frozen){
           int N=samples->size();
           if(N<max_samples_to_hold){
+            cout<<"Decision tree update"<<endl;
+            cout<<"size before:"<<samples->size()<<endl;
             samples->push_back(sample);
+            cout<<"size after push:"<<samples->size()<<endl;
+            cout<<endl<<"max_tree_depth:"<<max_tree_depth<<endl;
+            cout<<"min_samples_to_split:"<<min_samples_to_split<<endl;
+            cout<<"N:"<<N<<endl;
             if((N+1)%min_samples_to_split==0 && max_tree_depth>0){
               this->find_and_apply_best_split();
             }
@@ -118,9 +126,11 @@ class DecisionTreeNode{
 
 
     void find_and_apply_best_split(){
+      cout<<"find_and_apply_best_split"<<endl;
       Split<T> split=this->find_best_split();
       //apply the best split
       if(split.score>0.){
+        cout<<"Splitting"<<endl;
         this->criterion_feature=split.feature;
         this->criterion_threshold=split.threshold;
         this->left.reset(
@@ -129,7 +139,7 @@ class DecisionTreeNode{
             this->number_of_decision_functions,
             this->min_samples_to_split,
             this->max_samples_to_hold,
-            this->max_tree_depth,
+            this->max_tree_depth-1,
             split.left)
         );
         this->right.reset(
@@ -138,7 +148,7 @@ class DecisionTreeNode{
             this->number_of_decision_functions,
             this->min_samples_to_split,
             this->max_samples_to_hold,
-            this->max_tree_depth,
+            this->max_tree_depth-1,
             split.right)
         );
         //free some memory if possible

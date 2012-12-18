@@ -8,6 +8,8 @@
 #include <memory>
 #include <vector>
 #include <cstdlib>
+#include <utility>
+#include <iostream>
 
 
 
@@ -64,8 +66,8 @@ class OnlineRandomForestClassifier{
   ~OnlineRandomForestClassifier(){}
 
   void update_oob_error(TreeNodeOOB& tree, shared_ptr<Sample<T>> sample){
-    T prediction=tree.predict(sample->features);
-    if(prediction!=sample->prediction){
+    pair<T,T> prediction=tree.first->predict(sample->features);
+    if(prediction.first!=sample->prediction){
       tree.second->oob_absolute_error+=1;
     }
     tree.second->oob_samples_count+=1;
@@ -75,11 +77,32 @@ class OnlineRandomForestClassifier{
   void update_tree(TreeNodeOOB& tree, shared_ptr<Sample<T>> sample){
     int k=rand()%2;
     for(int i=0;i<k;i++){
-      tree.update(sample);
+      tree.first->update(sample);
     }
     if(k==0){
       update_oob_error(tree, sample);
     }
+  }
+
+  void update(shared_ptr<Sample<T>> sample){
+    for(auto i=trees->begin();i!=trees->end();i++){
+      update_tree(*i, sample);
+    }
+  }
+
+  pair<T,T> predict(shared_ptr<Sample<T>> sample){
+    pair<T,T> temp;
+    map<T,int> predictions;
+    map<T,T> predictions_probabilities;
+    float total_predictions=trees->size();
+    for(auto i=trees->begin();i!=trees->end();i++){
+      pair<T,T> prediction=(*i)->first->predict(sample);
+      predictions[prediction.first]+=1;
+      predictions_probabilities[prediction.first]+=prediction.second;
+    }
+    T prediction=utils::argmax(predictions);
+    T probability=predictions_probabilities[prediction]/total_predictions;
+    return pair<T,T>(prediction, probability);
   }
 
 };

@@ -8,6 +8,7 @@
 
 #include <utility>
 #include <memory>
+#include <iostream>
 
 template<class T>
 class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T>>{
@@ -42,26 +43,36 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
       T left_gini=utils::gini(left);
       T right_gini=utils::gini(right);
       float total=(float)my_predictions.size();
-      return my_error-1/total*(left_gini*left.size()+right_gini*right.size());
+      T score= my_error-1/total*(left_gini*left.size()+right_gini*right.size());
+      //cout<<"left size:"<<left.size()<<endl;
+      //cout<<"left gini:"<<left_gini<<endl;
+      //cout<<"right size:"<<right.size()<<endl;
+      //cout<<"right gini:"<<right_gini<<endl;
+      //cout<<"my error:"<<my_error<<endl;
+      //cout<<"score:"<<score<<endl;
+      return score;
     }
 
     virtual Split<T> find_best_split(){
       //find the best split
+      cout<<"Finding best split"<<endl;
       T best_split_score=0;
       T best_split_threshold=0.;
       int best_split_feature=-1;
       vector<shared_ptr<Sample<T>>> best_split_left;
       vector<shared_ptr<Sample<T>>> best_split_right;
       for(auto s=this->samples->begin();s!=this->samples->end();s++){
+        //TODO: use just different values of the same feature
         for(auto f=this->randomly_selected_features->begin();f!=this->randomly_selected_features->end();f++){
           vector<T> v=(*s)->features;
           T threshold=v[*f];
+          //cout<<"threshold:"<<threshold<<endl;
           vector<shared_ptr<Sample<T>>> left_samples;
           vector<T> left;
           vector<shared_ptr<Sample<T>>> right_samples;
           vector<T> right;
           for(auto s1=this->samples->begin();s1!=this->samples->end();s1++){
-            if(((*s)->features[*f])>threshold){
+            if(((*s1)->features[*f])>threshold){
               right.push_back((*s1)->prediction);
               right_samples.push_back(*s1);
             }
@@ -80,6 +91,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
           }
         }
       }
+      cout<<"best split score:"<<best_split_score<<endl;
       return Split<T>(best_split_threshold, best_split_feature, best_split_left, best_split_right, best_split_score);
     }
 

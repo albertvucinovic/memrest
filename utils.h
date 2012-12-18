@@ -46,11 +46,10 @@ T gini(vector<T> v){
   return res;
 }
 
-template<typename T> 
-T argmaxcount(vector<T> v){
+template<typename T>
+T argmax(map<T,int> counts){
   int max_count=0;
   T max_element;
-  map<T,int>counts=count_map(v);
   for(auto i=counts.begin();i!=counts.end();i++){
     if(i->second>max_count){
       max_count=i->second;
@@ -59,6 +58,14 @@ T argmaxcount(vector<T> v){
   }
   return max_element;
 }
+
+
+template<typename T> 
+T argmaxcount(vector<T> v){
+  map<T,int>counts=count_map(v);
+  return argmax<T>(counts);
+}
+
 
 template<typename T>
 T count(vector<T> v, T el){

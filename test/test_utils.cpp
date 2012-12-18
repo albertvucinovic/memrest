@@ -127,13 +127,23 @@ void test_classification_tree_node(){
 }
 
 void test_online_random_forest(){
-  OnlineRandomForestClassifier<float, ClassificationTreeNode<float>> rf(
-    10,10,5,5,10,10);
   vector<shared_ptr<Sample<float>>> data=read_svm_data<float>("../../forex/data/libsvm/dna.scale");
+  shared_ptr<Sample<float>> first_data=*(data.begin());
+  int num_features=first_data->features.size();
+  OnlineRandomForestClassifier<float, ClassificationTreeNode<float>> rf(
+    1,
+    num_features,
+    num_features/2,
+    10, //min split samples
+    30,
+    10
+    );
   for(auto i=data.begin();i!=data.end();i++){
-    utils::print((*i)->features);
-    cout<<endl<<"Prediction:"<<(*i)->prediction<<endl;
+  //  utils::print((*i)->features);
+  //  cout<<endl<<"Prediction:"<<(*i)->prediction<<endl;
+    rf.update(*i);
   }
+
 }
 
 
