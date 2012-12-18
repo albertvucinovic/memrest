@@ -10,13 +10,13 @@ struct Split{
   T threshold;
   int feature;
 
-  vector<shared_ptr<Sample<T>>> left, right;
+  shared_ptr<vector<shared_ptr<Sample<T>>>> left, right;
 
   T score;
 
   Split(T threshold, int feature, 
-    vector<shared_ptr<Sample<T>>> left, 
-    vector<shared_ptr<Sample<T>>> right, 
+    shared_ptr<vector<shared_ptr<Sample<T>>>> left, 
+    shared_ptr<vector<shared_ptr<Sample<T>>>> right, 
     T score):
       threshold(threshold),
       feature(feature),

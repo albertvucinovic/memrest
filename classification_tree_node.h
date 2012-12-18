@@ -20,7 +20,7 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
       int min_samples_to_split,
       int max_samples_to_hold,
       int max_tree_depth,
-      vector<shared_ptr<Sample<T>>> initial_samples=vector<shared_ptr<Sample<T>>>()
+      shared_ptr<vector<shared_ptr<Sample<T>>>> initial_samples=new vector<shared_ptr<Sample<T>>>()
     ):
       DecisionTreeNode<T, ClassificationTreeNode<T>>(
         number_of_features, 
@@ -60,26 +60,26 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
       T best_split_score=0;
       T best_split_threshold=0.;
       int best_split_feature=-1;
-      vector<shared_ptr<Sample<T>>> best_split_left;
-      vector<shared_ptr<Sample<T>>> best_split_right;
+      shared_ptr<vector<shared_ptr<Sample<T>>>> best_split_left;
+      shared_ptr<vector<shared_ptr<Sample<T>>>> best_split_right;
       for(auto s=this->samples->begin();s!=this->samples->end();s++){
         //TODO: use just different values of the same feature
         for(auto f=this->randomly_selected_features->begin();f!=this->randomly_selected_features->end();f++){
           vector<T> v=(*s)->features;
           T threshold=v[*f];
           //cout<<"threshold:"<<threshold<<endl;
-          vector<shared_ptr<Sample<T>>> left_samples;
+          shared_ptr<vector<shared_ptr<Sample<T>>>> left_samples(new vector<shared_ptr<Sample<T>>>());
           vector<T> left;
-          vector<shared_ptr<Sample<T>>> right_samples;
+          shared_ptr<vector<shared_ptr<Sample<T>>>> right_samples(new vector<shared_ptr<Sample<T>>>());
           vector<T> right;
           for(auto s1=this->samples->begin();s1!=this->samples->end();s1++){
             if(((*s1)->features[*f])>threshold){
               right.push_back((*s1)->prediction);
-              right_samples.push_back(*s1);
+              right_samples->push_back(*s1);
             }
             else{
               left.push_back((*s1)->prediction);
-              left_samples.push_back(*s1);
+              left_samples->push_back(*s1);
             }
           }
           T split_score=calculate_split_score(left, right);

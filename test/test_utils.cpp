@@ -99,7 +99,7 @@ void test_argmaxcount(){
 void test_classification_tree_node(){
 
   //DecisionTreeNode<float> n(100,10,10,20,10);
-  vector<shared_ptr<Sample<float>>> initial_samples;
+  shared_ptr<vector<shared_ptr<Sample<float>>>> initial_samples(new vector<shared_ptr<Sample<float>>>());
   ClassificationTreeNode<float> n(5,2,3,6,3,initial_samples);
   vector<float> t{1,2,3,4,5};
   float p=n.predict(t).first;
@@ -132,12 +132,12 @@ void test_online_random_forest(){
   shared_ptr<Sample<float>> first_data=*(data.begin());
   int num_features=first_data->features.size();
   OnlineRandomForestClassifier<float, ClassificationTreeNode<float>> rf(
-    100,
+    200,
     num_features,
     num_features/2,
     10, //min split samples
-    30,
-    10
+    30, //max samples to hold
+    20//max depth
     );
   for(auto i=data.begin();i!=data.end();i++){
   //  utils::print((*i)->features);

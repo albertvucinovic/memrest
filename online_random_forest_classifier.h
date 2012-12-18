@@ -46,7 +46,7 @@ class OnlineRandomForestClassifier{
   {
     trees.reset(new vector<TreeNodeOOB>());
     for(int i=0;i<number_of_trees;i++){
-      vector<shared_ptr<Sample<T>>> initial_samples=vector<shared_ptr<Sample<T>>>();
+      shared_ptr<vector<shared_ptr<Sample<T>>>> initial_samples(new vector<shared_ptr<Sample<T>>>());
       trees->push_back(
         TreeNodeOOB(
           unique_ptr<NodeType>(new NodeType(

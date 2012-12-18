@@ -23,7 +23,7 @@ class DecisionTreeNode{
     int max_samples_to_hold;
     //if max_tree_depth>0 then the tree depth can increese
     int max_tree_depth;
-    unique_ptr<vector<shared_ptr<Sample<T>>>> samples;
+    shared_ptr<vector<shared_ptr<Sample<T>>>> samples;
 
     unique_ptr<DecisionTreeNode<T,Node>> left;
     unique_ptr<DecisionTreeNode<T,Node>> right;
@@ -43,19 +43,19 @@ class DecisionTreeNode{
       int min_samples_to_split,
       int max_samples_to_hold,
       int max_tree_depth,
-      vector<shared_ptr<Sample<T>>> initial_samples=vector<shared_ptr<Sample<T>>>()
+      shared_ptr<vector<shared_ptr<Sample<T>>>> initial_samples=new vector<shared_ptr<Sample<T>>>()
     ):
       number_of_features(number_of_features),
       number_of_decision_functions(number_of_decision_functions),
       min_samples_to_split(min_samples_to_split),
       max_samples_to_hold(max_samples_to_hold),
-      max_tree_depth(max_tree_depth)
+      max_tree_depth(max_tree_depth),
+      samples(initial_samples)
     {
-      samples.reset(new vector<shared_ptr<Sample<T>>>(initial_samples));
       this->randomly_select_decision_functions();
       this->prediction_frozen=false;
-      DEBUG1(if(max_tree_depth<8) if(initial_samples.size()==0) 
-      cout<<"Initial samples size:"<<initial_samples.size()<<endl);
+      DEBUG1(if(max_tree_depth<8) if(initial_samples->size()==0) 
+      cout<<"Initial samples size:"<<initial_samples->size()<<endl);
     }
 
     ~DecisionTreeNode(){
@@ -131,8 +131,8 @@ class DecisionTreeNode{
         DEBUG1(cout<<"Splitting"<<endl);
         this->criterion_feature=split.feature;
         this->criterion_threshold=split.threshold;
-        DEBUG1(assert(split.left.size()>0);cout<<"left size:"<<split.left.size()<<endl;)
-        DEBUG1(assert(split.right.size()>0);cout<<"right size:"<<split.right.size()<<endl;)
+        DEBUG1(assert(split.left->size()>0);cout<<"left size:"<<split.left->size()<<endl;)
+        DEBUG1(assert(split.right->size()>0);cout<<"right size:"<<split.right->size()<<endl;)
         this->left.reset(
           new Node(
             this->number_of_features,
