@@ -90,13 +90,14 @@ class OnlineRandomForestClassifier{
     }
   }
 
-  pair<T,T> predict(shared_ptr<Sample<T>> sample){
+  pair<T,T> predict(vector<T>& sample){
     pair<T,T> temp;
     map<T,int> predictions;
     map<T,T> predictions_probabilities;
     float total_predictions=trees->size();
     for(auto i=trees->begin();i!=trees->end();i++){
-      pair<T,T> prediction=(*i)->first->predict(sample);
+      DEBUG1(assert(!(*i).first->is_leaf()));
+      pair<T,T> prediction=(*i).first->predict(sample);
       predictions[prediction.first]+=1;
       predictions_probabilities[prediction.first]+=prediction.second;
     }

@@ -8,7 +8,10 @@
 #include <cstdlib>
 #include <set>
 #include <utility>
+#include <cassert>
 using namespace std;
+
+#define DEBUG_LEVEL 1
 
 //T should be float or double
 template <class T, class Node>
@@ -48,9 +51,11 @@ class DecisionTreeNode{
       max_samples_to_hold(max_samples_to_hold),
       max_tree_depth(max_tree_depth)
     {
-      samples.reset(new vector<shared_ptr<Sample<T>>>());
+      samples.reset(new vector<shared_ptr<Sample<T>>>(initial_samples));
       this->randomly_select_decision_functions();
       this->prediction_frozen=false;
+      DEBUG1(if(max_tree_depth<8) if(initial_samples.size()==0) 
+      cout<<"Initial samples size:"<<initial_samples.size()<<endl);
     }
 
     ~DecisionTreeNode(){
@@ -126,6 +131,8 @@ class DecisionTreeNode{
         DEBUG1(cout<<"Splitting"<<endl);
         this->criterion_feature=split.feature;
         this->criterion_threshold=split.threshold;
+        DEBUG1(assert(split.left.size()>0);cout<<"left size:"<<split.left.size()<<endl;)
+        DEBUG1(assert(split.right.size()>0);cout<<"right size:"<<split.right.size()<<endl;)
         this->left.reset(
           new Node(
             this->number_of_features,
@@ -174,6 +181,7 @@ class DecisionTreeNode{
     
     //Releases its shared pointers for samples, and sets up the node to predict the learned value
     void freeze_prediction(){
+      DEBUG1(cout<<"freeze_prediction"<<endl);
       pair<T,T> prediction=node_prediction();
       this->frozen_prediction=node_prediction();
       this->prediction_frozen=true;

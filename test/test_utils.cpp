@@ -127,11 +127,12 @@ void test_classification_tree_node(){
 }
 
 void test_online_random_forest(){
-  vector<shared_ptr<Sample<float>>> data=read_svm_data<float>("../../forex/data/libsvm/dna.scale");
+  cout<<"Learning:"<<endl;
+  vector<shared_ptr<Sample<float>>> data=read_svm_data<float>("../../forex/data/libsvm/dna.scale.tr");
   shared_ptr<Sample<float>> first_data=*(data.begin());
   int num_features=first_data->features.size();
   OnlineRandomForestClassifier<float, ClassificationTreeNode<float>> rf(
-    1000,
+    100,
     num_features,
     num_features/2,
     10, //min split samples
@@ -143,7 +144,37 @@ void test_online_random_forest(){
   //  cout<<endl<<"Prediction:"<<(*i)->prediction<<endl;
     rf.update(*i);
   }
+
   //TODO: test with the test set
+  cout<<"Predicting training .."<<endl;
+  vector<float> predictions;
+  float correct=0.;
+  float total=data.size();
+  for(auto i=data.begin();i!=data.end();i++){
+    pair<float,float> result=rf.predict((*i)->features);
+    predictions.push_back(result.first);
+    if(result.first==(*i)->prediction){
+      correct+=1;
+    }
+  }
+  utils::print(predictions);
+  cout<<"Training correct percentage:"<<correct/total<<endl;
+
+  cout<<"Predicting test .."<<endl;
+  data=read_svm_data<float>("../../forex/data/libsvm/dna.scale.t");
+  predictions.clear();
+  correct=0;
+  for(auto i=data.begin();i!=data.end();i++){
+    pair<float,float> result=rf.predict((*i)->features);
+    predictions.push_back(result.first);
+    if(result.first==(*i)->prediction){
+      correct+=1;
+    }
+  }
+  utils::print(predictions);
+  cout<<"Test correct percentage:"<<correct/total<<endl;
+
+
 
 }
 
