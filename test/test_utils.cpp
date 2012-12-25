@@ -132,10 +132,10 @@ void test_online_random_forest(){
   shared_ptr<Sample<float>> first_data=*(data.begin());
   int num_features=first_data->features.size();
   OnlineRandomForestClassifier<float, ClassificationTreeNode<float>> rf(
-    200,
+    100,
     num_features,
-    num_features/2,
-    10, //min split samples
+    num_features,
+    15, //min split samples
     30, //max samples to hold
     20//max depth
     );
@@ -162,6 +162,7 @@ void test_online_random_forest(){
 
   cout<<"Predicting test .."<<endl;
   data=read_svm_data<float>("../../forex/data/libsvm/dna.scale.t");
+  total=data.size();
   predictions.clear();
   correct=0;
   for(auto i=data.begin();i!=data.end();i++){
