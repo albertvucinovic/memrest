@@ -98,10 +98,10 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
 
     pair<T,T> node_prediction(){
       if(this->samples->size()>0){
-        vector<T> spv=this->samples_prediction_vector();
-        DEBUG1(assert(spv.size()>0));
-        T prediction=utils::argmaxcount(spv);
-        T probability=utils::count(spv, prediction)/((float)spv.size());
+        shared_ptr<vector<T>> spv=this->samples_prediction_vector();
+        DEBUG1(assert(spv->size()>0));
+        T prediction=utils::argmaxcount(*spv);
+        T probability=utils::count(*spv, prediction)/((float)spv->size());
         return pair<T,T>(prediction, probability);
       }
       else{

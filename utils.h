@@ -11,7 +11,7 @@
 using namespace std;
 namespace utils{
 template<class T>
-vector<T> subsample(vector<T> v, vector<int> indices){
+vector<T> subsample(vector<T>& v, vector<int>& indices){
   vector<T> temp;
   for(vector<int>::iterator i=indices.begin();i!=indices.end();i++){
     temp.push_back(v[*i]);
@@ -20,7 +20,7 @@ vector<T> subsample(vector<T> v, vector<int> indices){
 }
 
 template<typename T>
-void print(vector<T> v){
+void print(vector<T>& v){
   cout<<"[";
   for(typename vector<T>::iterator i=v.begin();i!=v.end();i++){
     cout<<*i<<",";
@@ -29,7 +29,7 @@ void print(vector<T> v){
 }
 
 template<typename T>
-map<T,int> count_map(vector<T> v){
+map<T,int> count_map(vector<T>& v){
   map<T, int> counts;
   for(auto i=v.begin();i!=v.end();i++){
     //we are presuming that the default constructor for int sets the int to 0
@@ -39,7 +39,7 @@ map<T,int> count_map(vector<T> v){
 }
 
 template<typename T>
-T gini(vector<T> v){
+T gini(vector<T>& v){
   map<T,int> counts=count_map(v);
   float total=(float)v.size();
   T res=1.;
@@ -51,7 +51,7 @@ T gini(vector<T> v){
 }
 
 template<typename T>
-T argmax(map<T,int> counts){
+T argmax(map<T,int>& counts){
   int max_count=0;
   T max_element;
   for(auto i=counts.begin();i!=counts.end();i++){
@@ -65,14 +65,14 @@ T argmax(map<T,int> counts){
 
 
 template<typename T> 
-T argmaxcount(vector<T> v){
+T argmaxcount(vector<T>& v){
   map<T,int>counts=count_map(v);
   return argmax<T>(counts);
 }
 
 
 template<typename T>
-T count(vector<T> v, T el){
+T count(vector<T> &v, T el){
   T c=0;
   for(auto i=v.begin();i!=v.end();i++){
     if(*i==el) c+=1;

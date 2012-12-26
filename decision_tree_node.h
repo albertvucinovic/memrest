@@ -94,30 +94,22 @@ class DecisionTreeNode{
       }
     }
 
-    shared_ptr<T> samples_matrix(){
-      T* temp=new T[samples->size()*number_of_decision_functions];
+    shared_ptr<vector<T>> samples_matrix(){
+      shared_ptr<vector<T>> temp=new vector<T>(samples->size()*number_of_decision_functions);
       int k=0;
       for(auto j=samples->begin();j!=samples->end();j++){
         for(auto i=randomly_selected_features->begin();i!=randomly_selected_features->end();i++){
-          temp[k]=j->features[*i];
+          (*temp)[k]=j->features[*i];
           k++;
         }
       }
-      return shared_ptr<T>(temp);
+      return temp;
     }
 
-    shared_ptr<T> samples_prediction_array(){
-      T* temp=new T[samples->size()];
-      for(auto i=samples->begin(),j=0;i!=samples->end();j++,i++){
-        temp[j]=i->prediction;
-      }
-      return shared_ptr<T>(temp);
-    }
-
-    vector<T> samples_prediction_vector(){
-      vector<T> temp;
+    shared_ptr<vector<T>> samples_prediction_vector(){
+      shared_ptr<vector<T>> temp(new vector<T>);
       for(auto i=samples->begin();i!=samples->end();i++){
-        temp.push_back((*i)->prediction);
+        temp->push_back((*i)->prediction);
       }
       return temp;
     }
