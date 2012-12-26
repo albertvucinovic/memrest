@@ -8,35 +8,124 @@
 #include <map>
 #include <pair>
 
+#include <CL/cl.h>
+
 using namespace std;
+
 
 template<typename T>
 class OpenCLGiniCalculator{
   public:
     string float_type='float';
-    OpenCLGiniCalculator(string float_type='float')
-      :float_type(float_type)
-    {}
-
-    ~OpenCLGiniCalculator(){
+    map<pair<int,int>, cl_kernel> kernels;
+    OpenCLGiniCalculator(int max_num_features, int max_num_samples,string float_type='float')
+      :
+      float_type(float_type),
+      //for different kernels we will use the same memory
+      //so we need the maximum dimensions of the matrix to allocate
+      max_num_features(max_num_features),
+      max_num_samples(max_num_samples)
+    {
+      // Get platform and device information
+      platform_id = NULL;
+      device_id = NULL;   
+      ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
+      ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_DEFAULT, 1, 
+              &device_id, &ret_num_devices);
+   
+      // Create an OpenCL context
+      context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
+   
+      // Create a command queue
+      command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
     }
 
-    T* opencl_gini_matrix(int num_features, int num_samples, T *matrix, T *classes){
-      ctemplate::TemplateDictionary dict("kernel");
-      dict["prime"] = "4294967291";
-      dict["float_type"]=this->float_type;
-      dict["num_samples"] = to_string(num_samples);
-      dict["num_features"]=to_string(num_features);
-      std::string kernel_with_args;
-      ctemplate::StringToTemplateCache("kernel", kernel, ctemplate::DO_NOT_STRIP);
-      ctemplate::ExpandTemplate("kernel", ctemplate::DO_NOT_STRIP, &dict, &kernel_with_args);
-      std::cout << kernel_with_args;
+    ~OpenCLGiniCalculator(){
+      // Clean up
+      ret = clFlush(command_queue);
+      ret = clFinish(command_queue);
+      //TODO:should map over all kernels
+      //ret = clReleaseKernel(kernel);
+      //ret = clReleaseProgram(program);
+      ret = clReleaseCommandQueue(command_queue);
+      ret = clReleaseContext(context);
+    }
 
-      
+    shared_ptr<vector<T>> opencl_gini_matrix(
+      pair<int,int> matrix_dimensions, 
+      shared_ptr<vector<T>> matrix, 
+      shared_ptr<vector<T>> classes)
+    {
+      cl_kernel kernel;
+      if(kernels[matrix_dimensions]){
+        kernel=kernels[matrix_dimensions];
+      }
+      else{
+        int num_features=matrix_dimensions.first;
+        int num_samples=matrix_dimesions.second;
+        ctemplate::TemplateDictionary dict("kernel");
+        dict["prime"] = "4294967291";
+        dict["float_type"]=this->float_type;
+        dict["num_samples"] = to_string(num_samples);
+        dict["num_features"]=to_string(num_features);
+        std::string kernel_with_args;
+        ctemplate::StringToTemplateCache("kernel", kernel_template, ctemplate::DO_NOT_STRIP);
+        ctemplate::ExpandTemplate("kernel", ctemplate::DO_NOT_STRIP, &dict, &kernel_with_args);
+        //std::cout << kernel_with_args;
+
+        // Create a program from the kernel source
+        size_t size_of_program=kernel_with_args.size();
+        cl_program program = clCreateProgramWithSource(context, 1, 
+                (const char **)&kernel_with_args.c_str(), (const size_t *)&size_of_program, &ret);
+        // Build the program
+        ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+        // Create the OpenCL kernel
+        kernel = clCreateKernel(program, "gini_kernel", &ret);
+        kernels[matrix_dimensions]=kernel;
+      }
+
+ 
+      cl_mem A_mem = clCreateBuffer(context, CL_MEM_READ_ONLY || CL_MEM_COPY_HOST_PTR, 
+            num_features*num_samples * sizeof(T), &(matrix->[0]), &ret);
+      cl_mem sample_classes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY || CL_MEM_COPY_HOST_PTR, 
+            num_samples * sizeof(T), &(classes->[0]), &ret);
+      cl_mem gini_res_mem = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
+            num_features*num_samples * sizeof(T), NULL, &ret);
+
+      // Set the arguments of the kernel
+      ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&A_mem);
+      ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&sample_classes_mem);
+      ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&gini_res_mem);
+
+      const size_t global_work_size[]={num_features, num_samples};
+      const size_t local_work_size[]={1, num_samples};
+      ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL, 
+        global_work_size, local_work_size, 0, NULL, NULL);
+
+      shared_ptr<vector<T>> result(new vector<T>(num_features*num_samples));
+      //we are assuming that the vector storage is continuous as per the c++11 standard
+      ret = clEnqueueReadBuffer(command_queue, gini_res_mem, CL_TRUE, 0, 
+            num_features*num_samples * sizeof(T), &(result->[0]), 0, NULL, NULL);
+
+      ret = clReleaseMemObject(A_mem);
+      ret = clReleaseMemObject(sample_classes_mem);
+      ret = clReleaseMemObject(gini_res_mem);
+
+      return result;
     }
 
   private:
-const char *kernel=R"KERNEL(
+    
+    cl_platform_id platform_id;
+    cl_device_id device_id;
+    cl_uint ret_num_devices;
+    cl_uing ret_num_platforms;
+    cl_int ret;
+    cl_context context;
+    cl_command_queue command_queue;
+
+
+const char *kernel_template=R"KERNEL(
 //we are using a hash function to collect frequency counts for classes
 //may be inacurate, but the probability for that should be low
 #define hash(k) as_int((k)) % {{prime}} % {{num_samples}}
@@ -64,6 +153,7 @@ void gini(
 
   int main_index=thread_sample*{{num_features}}+thread_feature;
 
+  
   A_local[thread_sample]=A[main_index];
 
   sample_classes_local[thread_sample]=sample_classes[thread_sample];
@@ -96,7 +186,7 @@ void gini(
   {{float_type}} right_total=0.;
   for(int i=0; i<{{num_samples}}; i++){
     //int index=i*{{num_features}}+thread_feature;
-    int hashed_index=hash(sample_classes_local[i]);
+uum    int hashed_index=hash(sample_classes_local[i]);
     //A_local[index]>threshold returns a 0 or 1, so it increments the index for the right class
     int class=(A_local[i]>threshold);
     right_total=right_total+({{float_type}})class;
