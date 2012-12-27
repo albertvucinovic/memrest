@@ -83,26 +83,20 @@ class OpenCLGiniCalculator{
         printf("\"PRINTF%sPRINTF\"",kernel_as_c_string);
         cl_program program = clCreateProgramWithSource(context, 1, 
                 (const char **)&kernel_as_c_string, (const size_t *)&size_of_program, &ret);
-        cout<<"clCreateProgramWithSource"<<ret<<endl;
         // Build the program
         ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
-        cout<<"clBuildProgram"<<ret<<endl;
         // Create the OpenCL kernel
         kernel = clCreateKernel(program, "gini", &ret);
-        cout<<"clCreateKernel"<<ret<<endl;
 
         kernels[matrix_dimensions]=kernel;
       }
 
       cl_mem A_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
             num_features*num_samples * sizeof(T), &((*matrix)[0]), &ret);
-      cout<<"clCreateBuffer A"<<ret<<endl;
       cl_mem sample_classes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
             num_samples * sizeof(T), &((*classes)[0]), &ret);
-      cout<<"clCreateBuffer sample classes"<<ret<<endl;
       cl_mem gini_res_mem = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
             num_features*num_samples * sizeof(T), NULL, &ret);
-      cout<<"clCreateBuffer gini_res"<<ret<<endl;
 
       // Set the arguments of the kernel
       ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&A_mem);
@@ -114,19 +108,15 @@ class OpenCLGiniCalculator{
       cl_event kernel_event;
       ret = clEnqueueNDRangeKernel(this->command_queue, kernel, 2, NULL, 
         global_work_size, local_work_size, 0, NULL, &kernel_event);
-      cout<<"clEnqueueNDRangeKernel"<<ret<<endl;
 
       shared_ptr<vector<T>> result(new vector<T>(num_features*num_samples));
       //we are assuming that the vector storage is continuous as per the c++11 standard
-      ret = clFinish(this->command_queue);
-      cout<<"clFinish "<<ret<<endl;
       ret=clEnqueueBarrier(this->command_queue);
 
       
       T *C = (T*)malloc(sizeof(T)*num_samples*num_features);
       ret = clEnqueueReadBuffer(this->command_queue, gini_res_mem, CL_TRUE, 0, 
             num_features*num_samples * sizeof(T), &((*result)[0]), 1, &kernel_event, NULL);
-      cout<<"clEnqueueReadBuffer"<<ret<<endl;
 
       ret = clReleaseMemObject(A_mem);
       ret = clReleaseMemObject(sample_classes_mem);
@@ -142,23 +132,18 @@ class OpenCLGiniCalculator{
       :
       float_type(float_type)
     {
-      cout<<"OpenCLGiniCalculator constructor"<<endl;
       // Get platform and device information
       platform_id = NULL;
       device_id = NULL;   
       ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-      cout<<"clGetPlatformIDs"<<ret<<endl;
       ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_DEFAULT, 1, 
               &device_id, &ret_num_devices);
-      cout<<"clGetDeviceIDs"<<ret<<endl;
    
       // Create an OpenCL context
       context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
-      cout<<"clCreateContext"<<ret<<endl;
    
       // Create a command queue
       this->command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
-      cout<<"clCreateCommandQueue"<<ret<<endl;
 
       clFinish(command_queue);
     }

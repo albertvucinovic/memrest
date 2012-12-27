@@ -46,13 +46,10 @@ class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTree
         predictions
         );
 
-      cout<<"Calculated_gini matrix:";
-      //utils::print(*calculated_gini);
       //finding best split parameters
       pair<T,int> m=utils::argmax(*calculated_gini);
       T best_split_score=m.first;
       int best_score_index=m.second;
-      cout<<"best_score_index"<<best_score_index<<endl;
       T threshold=(*sm)[best_score_index];
       int best_split_feature=best_score_index%num_features;
 
@@ -60,15 +57,10 @@ class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTree
       shared_ptr<vector<shared_ptr<Sample<T>>>> left_samples(new vector<shared_ptr<Sample<T>>>());
       shared_ptr<vector<shared_ptr<Sample<T>>>> right_samples(new vector<shared_ptr<Sample<T>>>());
       for(auto s1=this->samples->begin();s1!=this->samples->end();s1++){
-        cout<<"Threshold:"<<threshold<<endl;
-        cout<<"best_split_feature"<<best_split_feature<<endl;
-        cout<<"sample feature:"<<(*s1)->features[best_split_feature]<<endl;
         if(((*s1)->features[best_split_feature])>threshold){
-          cout<<"pushing right"<<endl;
           right_samples->push_back(*s1);
         }
         else{
-          cout<<"pushing left"<<endl;
           left_samples->push_back(*s1);
         }
       }
