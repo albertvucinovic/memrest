@@ -79,22 +79,30 @@ class OpenCLGiniCalculator{
         // Create a program from the kernel source
         size_t size_of_program=kernel_with_args.size();
         const char *kernel_as_c_string=kernel_with_args.c_str();
+        //printf("\"PRINTF%sPRINTF\"",kernel_as_c_string);
         cl_program program = clCreateProgramWithSource(context, 1, 
                 (const char **)&kernel_as_c_string, (const size_t *)&size_of_program, &ret);
+        cout<<"clCreateProgramWithSource"<<ret<<endl;
         // Build the program
         ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+        cout<<"clBuildProgram"<<ret<<endl;
         // Create the OpenCL kernel
-        kernel = clCreateKernel(program, "gini_kernel", &ret);
+        kernel = clCreateKernel(program, "gini", &ret);
+        cout<<"clCreateKernel"<<ret<<endl;
+        cout<<CL_INVALID_KERNEL_NAME<<endl;
         kernels[matrix_dimensions]=kernel;
       }
 
  
       cl_mem A_mem = clCreateBuffer(context, CL_MEM_READ_ONLY || CL_MEM_COPY_HOST_PTR, 
             num_features*num_samples * sizeof(T), &((*matrix)[0]), &ret);
+      cout<<"clCreateBuffer A"<<ret<<endl;
       cl_mem sample_classes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY || CL_MEM_COPY_HOST_PTR, 
             num_samples * sizeof(T), &((*classes)[0]), &ret);
+      cout<<"clCreateBuffer sample classes"<<ret<<endl;
       cl_mem gini_res_mem = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
             num_features*num_samples * sizeof(T), NULL, &ret);
+      cout<<"clCreateBuffer gini_res"<<ret<<endl;
 
       // Set the arguments of the kernel
       ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&A_mem);
@@ -129,14 +137,18 @@ class OpenCLGiniCalculator{
       platform_id = NULL;
       device_id = NULL;   
       ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
+      cout<<"clGetPlatformIDs"<<ret<<endl;
       ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_DEFAULT, 1, 
               &device_id, &ret_num_devices);
+      cout<<"clGetDeviceIDs"<<ret<<endl;
    
       // Create an OpenCL context
       context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
+      cout<<"clCreateContext"<<ret<<endl;
    
       // Create a command queue
       command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
+      cout<<"clCreateCommandQueue"<<ret<<endl;
     }
 
     
@@ -210,7 +222,7 @@ void gini(
   {{float_type}} right_total=0.;
   for(int i=0; i<{{num_samples}}; i++){
     //int index=i*{{num_features}}+thread_feature;
-uum    int hashed_index=hash(sample_classes_local[i]);
+    int hashed_index=hash(sample_classes_local[i]);
     //A_local[index]>threshold returns a 0 or 1, so it increments the index for the right class
     int class=(A_local[i]>threshold);
     right_total=right_total+({{float_type}})class;
