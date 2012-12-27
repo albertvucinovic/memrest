@@ -1,0 +1,30 @@
+
+memrest=/home/albert/Projekti/forex/memrest {
+ 1
+ README
+ classification_tree_node.h
+ classification_tree_node_opencl.h
+ decision_tree_node.h
+ octave-core
+ online_random_forest_classifier.h
+ oob_error.h
+ opencl_gini_calculator.h
+ sample.h
+ split.h
+ todo.txt
+ utils.h
+ test=test {
+  data.h
+  out.txt
+  test_basic
+  test_basic.cpp
+  test_opencl
+  test_opencl.cpp
+  test_opencl.sh
+  test_opencl_gini.cpp
+  test_opencl_gini.sh
+  test_utils.cpp
+  test_utils.sh
+  vector_add_kernel.cl
+ }
+}
