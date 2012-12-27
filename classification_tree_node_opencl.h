@@ -45,8 +45,8 @@ class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTree
         this->samples_prediction_vector()
         );
 
-      //cout<<"Calculated_gini matrix:";
-      //utils::print(*calculated_gini);
+      cout<<"Calculated_gini matrix:";
+      utils::print(*calculated_gini);
       //finding best split parameters
       pair<T,int> m=utils::argmax(*calculated_gini);
       T best_split_score=m.first;
