@@ -1,7 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#define DEBUG_LEVEL 1
+#define DEBUG_LEVEL 0
 
 #define TYPE "float"
 

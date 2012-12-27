@@ -54,8 +54,6 @@ class DecisionTreeNode{
     {
       this->randomly_select_decision_functions();
       this->prediction_frozen=false;
-      DEBUG1(if(max_tree_depth<8) if(initial_samples->size()==0) 
-      cout<<"Initial samples size:"<<initial_samples->size()<<endl);
     }
 
     ~DecisionTreeNode(){
@@ -116,11 +114,9 @@ class DecisionTreeNode{
 
 
     void find_and_apply_best_split(){
-      DEBUG1(cout<<"find_and_apply_best_split"<<endl);
       Split<T> split=this->find_best_split();
       //apply the best split
       if(split.score>0.){
-        DEBUG1(cout<<"Splitting"<<endl);
         this->criterion_feature=split.feature;
         this->criterion_threshold=split.threshold;
         DEBUG1(assert(split.left->size()>0);cout<<"left size:"<<split.left->size()<<endl;)
@@ -173,7 +169,6 @@ class DecisionTreeNode{
     
     //Releases its shared pointers for samples, and sets up the node to predict the learned value
     void freeze_prediction(){
-      DEBUG1(cout<<"freeze_prediction"<<endl);
       pair<T,T> prediction=node_prediction();
       this->frozen_prediction=node_prediction();
       this->prediction_frozen=true;

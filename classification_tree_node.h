@@ -55,7 +55,6 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
 
     virtual Split<T> find_best_split(){
       //find the best split
-      DEBUG1(cout<<"Finding best split"<<endl);
       T best_split_score=0;
       T best_split_threshold=0.;
       int best_split_feature=-1;
@@ -103,7 +102,6 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
         return pair<T,T>(prediction, probability);
       }
       else{
-        DEBUG1(cout<<"Returning a nan"<<endl);
         return pair<T,T>(0./0., 0.);//a NaN
       }
     }

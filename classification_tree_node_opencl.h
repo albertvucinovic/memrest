@@ -33,7 +33,6 @@ class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTree
     ~ClassificationTreeNodeOpenCL(){}
 
     virtual Split<T> find_best_split(){
-      DEBUG1(cout<<"Finding best split OpenCL"<<endl);
       int num_samples=this->samples->size();
       int num_features=this->number_of_decision_functions;
       shared_ptr<vector<T>> sm=this->samples_matrix();
@@ -76,13 +75,11 @@ class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTree
     pair<T,T> node_prediction(){
       if(this->samples->size()>0){
         shared_ptr<vector<T>> spv=this->samples_prediction_vector();
-        DEBUG1(assert(spv->size()>0));
         T prediction=utils::argmaxcount(*spv);
         T probability=utils::count(*spv, prediction)/((float)spv->size());
         return pair<T,T>(prediction, probability);
       }
       else{
-        DEBUG1(cout<<"Returning a nan"<<endl);
         return pair<T,T>(0./0., 0.);//a NaN
       }
     }

@@ -142,8 +142,8 @@ void test_online_random_forest(){
     100,
     num_features,
     num_features,
-    15, //min split samples
-    30, //max samples to hold
+    30, //min split samples
+    90, //max samples to hold
     20//max depth
     );
   for(auto i=data.begin();i!=data.end();i++){
