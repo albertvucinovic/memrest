@@ -138,7 +138,7 @@ void test_online_random_forest(){
   vector<shared_ptr<Sample<float>>> data=read_svm_data<float>("../../forex/data/libsvm/dna.scale.tr");
   shared_ptr<Sample<float>> first_data=*(data.begin());
   int num_features=first_data->features.size();
-  OnlineRandomForestClassifier<float, ClassificationTreeNodeOpenCL<float>> rf(
+  OnlineRandomForestClassifier<float, ClassificationTreeNode<float>> rf(
     100,
     num_features,
     num_features,
