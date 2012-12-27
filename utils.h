@@ -3,6 +3,8 @@
 
 #define DEBUG_LEVEL 1
 
+#define TYPE "float"
+
 #define DEBUG1(T) if( DEBUG_LEVEL >=1) T;
 
 #include <vector>
@@ -61,6 +63,20 @@ T argmax(map<T,int>& counts){
     }
   }
   return max_element;
+}
+
+template<typename T>
+pair<T,int> argmax(vector<T>& v){
+  int i=0;
+  T m=*(v.begin());
+  int s=v.size();
+  for(int k=0;k<s;k++){
+    if(v[k]>m){
+      m=v[k];
+      i=k;
+    }
+  }
+  return pair<T,int>(m, i);
 }
 
 

@@ -95,11 +95,11 @@ class DecisionTreeNode{
     }
 
     shared_ptr<vector<T>> samples_matrix(){
-      shared_ptr<vector<T>> temp=new vector<T>(samples->size()*number_of_decision_functions);
+      shared_ptr<vector<T>> temp(new vector<T>(samples->size()*number_of_decision_functions));
       int k=0;
       for(auto j=samples->begin();j!=samples->end();j++){
         for(auto i=randomly_selected_features->begin();i!=randomly_selected_features->end();i++){
-          (*temp)[k]=j->features[*i];
+          (*temp)[k]=(*j)->features[*i];
           k++;
         }
       }

@@ -6,40 +6,43 @@
 #include <string>
 #include <ctemplate/template.h>
 #include <map>
-#include <pair>
+#include <utility>
+#include <typeinfo>
 
 #include <CL/cl.h>
 
 using namespace std;
 
+//For getting the typename T into the OpenCL kernel
+template<typename T>
+struct TypeParseTraits;
+
+#define REGISTER_PARSE_TYPE(X) template <> struct TypeParseTraits<X> \
+    { static const char* name; } ; const char* TypeParseTraits<X>::name = #X
+
+
+REGISTER_PARSE_TYPE(float);
+REGISTER_PARSE_TYPE(double);
+//END For getting the typename T into the OpenCL kernel
+
+
 
 template<typename T>
 class OpenCLGiniCalculator{
   public:
-    string float_type='float';
-    map<pair<int,int>, cl_kernel> kernels;
-    OpenCLGiniCalculator(int max_num_features, int max_num_samples,string float_type='float')
-      :
-      float_type(float_type),
-      //for different kernels we will use the same memory
-      //so we need the maximum dimensions of the matrix to allocate
-      max_num_features(max_num_features),
-      max_num_samples(max_num_samples)
-    {
-      // Get platform and device information
-      platform_id = NULL;
-      device_id = NULL;   
-      ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-      ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_DEFAULT, 1, 
-              &device_id, &ret_num_devices);
-   
-      // Create an OpenCL context
-      context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
-   
-      // Create a command queue
-      command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
-    }
 
+    static bool created;
+
+    string float_type=TypeParseTraits<T>::name;//"float" or "double"
+    map<pair<int,int>, cl_kernel> kernels;
+    
+    static OpenCLGiniCalculator* get_instance(){
+      if(!created){
+        OpenCLGiniCalculator::single=new OpenCLGiniCalculator(TypeParseTraits<T>::name);
+        OpenCLGiniCalculator::created=true;
+      }
+      return OpenCLGiniCalculator::single;
+    }
     ~OpenCLGiniCalculator(){
       // Clean up
       ret = clFlush(command_queue);
@@ -57,12 +60,12 @@ class OpenCLGiniCalculator{
       shared_ptr<vector<T>> classes)
     {
       cl_kernel kernel;
+      int num_features=matrix_dimensions.first;
+      int num_samples=matrix_dimensions.second;
       if(kernels[matrix_dimensions]){
         kernel=kernels[matrix_dimensions];
       }
       else{
-        int num_features=matrix_dimensions.first;
-        int num_samples=matrix_dimesions.second;
         ctemplate::TemplateDictionary dict("kernel");
         dict["prime"] = "4294967291";
         dict["float_type"]=this->float_type;
@@ -75,8 +78,9 @@ class OpenCLGiniCalculator{
 
         // Create a program from the kernel source
         size_t size_of_program=kernel_with_args.size();
+        const char *kernel_as_c_string=kernel_with_args.c_str();
         cl_program program = clCreateProgramWithSource(context, 1, 
-                (const char **)&kernel_with_args.c_str(), (const size_t *)&size_of_program, &ret);
+                (const char **)&kernel_as_c_string, (const size_t *)&size_of_program, &ret);
         // Build the program
         ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
         // Create the OpenCL kernel
@@ -86,9 +90,9 @@ class OpenCLGiniCalculator{
 
  
       cl_mem A_mem = clCreateBuffer(context, CL_MEM_READ_ONLY || CL_MEM_COPY_HOST_PTR, 
-            num_features*num_samples * sizeof(T), &(matrix->[0]), &ret);
+            num_features*num_samples * sizeof(T), &((*matrix)[0]), &ret);
       cl_mem sample_classes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY || CL_MEM_COPY_HOST_PTR, 
-            num_samples * sizeof(T), &(classes->[0]), &ret);
+            num_samples * sizeof(T), &((*classes)[0]), &ret);
       cl_mem gini_res_mem = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
             num_features*num_samples * sizeof(T), NULL, &ret);
 
@@ -97,15 +101,15 @@ class OpenCLGiniCalculator{
       ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&sample_classes_mem);
       ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&gini_res_mem);
 
-      const size_t global_work_size[]={num_features, num_samples};
-      const size_t local_work_size[]={1, num_samples};
+      const size_t global_work_size[]={num_samples, num_features};
+      const size_t local_work_size[]={num_samples,1};
       ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL, 
         global_work_size, local_work_size, 0, NULL, NULL);
 
       shared_ptr<vector<T>> result(new vector<T>(num_features*num_samples));
       //we are assuming that the vector storage is continuous as per the c++11 standard
       ret = clEnqueueReadBuffer(command_queue, gini_res_mem, CL_TRUE, 0, 
-            num_features*num_samples * sizeof(T), &(result->[0]), 0, NULL, NULL);
+            num_features*num_samples * sizeof(T), &((*result)[0]), 0, NULL, NULL);
 
       ret = clReleaseMemObject(A_mem);
       ret = clReleaseMemObject(sample_classes_mem);
@@ -115,11 +119,31 @@ class OpenCLGiniCalculator{
     }
 
   private:
+    static OpenCLGiniCalculator *single;
+
+    OpenCLGiniCalculator(string float_type)
+      :
+      float_type(float_type)
+    {
+      // Get platform and device information
+      platform_id = NULL;
+      device_id = NULL;   
+      ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
+      ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_DEFAULT, 1, 
+              &device_id, &ret_num_devices);
+   
+      // Create an OpenCL context
+      context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
+   
+      // Create a command queue
+      command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
+    }
+
     
     cl_platform_id platform_id;
     cl_device_id device_id;
     cl_uint ret_num_devices;
-    cl_uing ret_num_platforms;
+    cl_uint ret_num_platforms;
     cl_int ret;
     cl_context context;
     cl_command_queue command_queue;
@@ -229,5 +253,13 @@ uum    int hashed_index=hash(sample_classes_local[i]);
 )KERNEL";
 
 };
+
+template<typename T>
+bool OpenCLGiniCalculator<T>::created=false;
+
+template<typename T>
+OpenCLGiniCalculator<T> *OpenCLGiniCalculator<T>::single=NULL;
+
+
 
 #endif //GINI_OPENCL

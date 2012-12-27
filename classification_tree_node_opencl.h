@@ -2,11 +2,15 @@
 #define CLASSIFICATION_NODE_OPENCL
 
 #include <decision_tree_node.h>
-#include <gini_opencl.h>
+#include <opencl_gini_calculator.h>
+#include <utils.h>
+#include <iostream>
+using namespace std;
 
 template<class T>
 class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTreeNodeOpenCL<T>>{
   public:
+    OpenCLGiniCalculator<T> *gini_calc;
     ClassificationTreeNodeOpenCL(
       int number_of_features,
       int number_of_decision_functions,
@@ -23,22 +27,67 @@ class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTree
         max_tree_depth,
         initial_samples)
     {
+      gini_calc=OpenCLGiniCalculator<T>::get_instance();
     }
 
     ~ClassificationTreeNodeOpenCL(){}
 
     virtual Split<T> find_best_split(){
       DEBUG1(cout<<"Finding best split OpenCL"<<endl);
-      T best_split_score=0;
-      T best_split_threshold=0.;
-      int best_split_feature=-1;
-      shared_ptr<vector<shared_ptr<Sample<T>>>> best_split_left;
-      shared_ptr<vector<shared_ptr<Sample<T>>>> best_split_right;
+      int num_samples=this->samples->size();
+      int num_features=this->number_of_decision_functions;
+      shared_ptr<vector<T>> samples_matrix=this->samples_matrix();
 
+      //the key step
+      shared_ptr<vector<T>> calculated_gini=gini_calc->opencl_gini_matrix(
+        pair<int,int>(num_features, num_samples), 
+        samples_matrix,
+        this->samples_prediction_vector()
+        );
 
+      cout<<"Calculated_gini matrix:";
+      utils::print(*calculated_gini);
+      //finding best split parameters
+      pair<T,int> m=utils::argmax(*calculated_gini);
+      T best_split_score=m.first;
+      int best_score_index=m.second;
+      T threshold=(*samples_matrix)[best_score_index];
+      int best_split_feature=best_score_index%num_features;
+
+      //splitting the samples
+      shared_ptr<vector<shared_ptr<Sample<T>>>> left_samples(new vector<shared_ptr<Sample<T>>>());
+      shared_ptr<vector<shared_ptr<Sample<T>>>> right_samples(new vector<shared_ptr<Sample<T>>>());
+      for(auto s1=this->samples->begin();s1!=this->samples->end();s1++){
+        if(((*s1)->features[best_split_feature])>threshold){
+          right_samples->push_back(*s1);
+        }
+        else{
+          left_samples->push_back(*s1);
+        }
+      }
+      DEBUG1(cout<<"best split score:"<<best_split_score<<endl);
+      return Split<T>(
+        threshold, 
+        best_split_feature, 
+        left_samples, 
+        right_samples, 
+        best_split_score);
     }
 
+    pair<T,T> node_prediction(){
+      if(this->samples->size()>0){
+        shared_ptr<vector<T>> spv=this->samples_prediction_vector();
+        DEBUG1(assert(spv->size()>0));
+        T prediction=utils::argmaxcount(*spv);
+        T probability=utils::count(*spv, prediction)/((float)spv->size());
+        return pair<T,T>(prediction, probability);
+      }
+      else{
+        DEBUG1(cout<<"Returning a nan"<<endl);
+        return pair<T,T>(0./0., 0.);//a NaN
+      }
+    }
 
-}
+};
 
 #endif
