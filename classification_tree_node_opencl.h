@@ -36,32 +36,39 @@ class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTree
       DEBUG1(cout<<"Finding best split OpenCL"<<endl);
       int num_samples=this->samples->size();
       int num_features=this->number_of_decision_functions;
-      shared_ptr<vector<T>> samples_matrix=this->samples_matrix();
+      shared_ptr<vector<T>> sm=this->samples_matrix();
+      shared_ptr<vector<T>> predictions=this->samples_prediction_vector();
 
       //the key step
       shared_ptr<vector<T>> calculated_gini=gini_calc->opencl_gini_matrix(
         pair<int,int>(num_features, num_samples), 
-        samples_matrix,
-        this->samples_prediction_vector()
+        sm,
+        predictions
         );
 
       cout<<"Calculated_gini matrix:";
-      utils::print(*calculated_gini);
+      //utils::print(*calculated_gini);
       //finding best split parameters
       pair<T,int> m=utils::argmax(*calculated_gini);
       T best_split_score=m.first;
       int best_score_index=m.second;
-      T threshold=(*samples_matrix)[best_score_index];
+      cout<<"best_score_index"<<best_score_index<<endl;
+      T threshold=(*sm)[best_score_index];
       int best_split_feature=best_score_index%num_features;
 
       //splitting the samples
       shared_ptr<vector<shared_ptr<Sample<T>>>> left_samples(new vector<shared_ptr<Sample<T>>>());
       shared_ptr<vector<shared_ptr<Sample<T>>>> right_samples(new vector<shared_ptr<Sample<T>>>());
       for(auto s1=this->samples->begin();s1!=this->samples->end();s1++){
+        cout<<"Threshold:"<<threshold<<endl;
+        cout<<"best_split_feature"<<best_split_feature<<endl;
+        cout<<"sample feature:"<<(*s1)->features[best_split_feature]<<endl;
         if(((*s1)->features[best_split_feature])>threshold){
+          cout<<"pushing right"<<endl;
           right_samples->push_back(*s1);
         }
         else{
+          cout<<"pushing left"<<endl;
           left_samples->push_back(*s1);
         }
       }

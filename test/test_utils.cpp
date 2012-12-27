@@ -126,6 +126,13 @@ void test_classification_tree_node(){
 
 }
 
+void test_argmax_vector(){
+  vector<int> a {5,2,6,8};
+  pair<int,int> m=utils::argmax(a);
+  cout<<"argmax.first"<<m.first<<endl;
+  cout<<"argmax.second"<<m.second<<endl;
+}
+
 void test_online_random_forest(){
   cout<<"Learning:"<<endl;
   vector<shared_ptr<Sample<float>>> data=read_svm_data<float>("../../forex/data/libsvm/dna.scale.tr");
@@ -197,6 +204,8 @@ int main(void){
   test(&test_argmaxcount, "argmaxcount");
 
   test(&test_classification_tree_node, "classification tree node");
+
+  test(&test_argmax_vector, "argmax vector");
 
   test(&test_online_random_forest, "test_online_random_forest");
   

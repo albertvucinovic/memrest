@@ -1,11 +1,8 @@
-
 memrest=/home/albert/Projekti/forex/memrest {
- 1
  README
  classification_tree_node.h
  classification_tree_node_opencl.h
  decision_tree_node.h
- octave-core
  online_random_forest_classifier.h
  oob_error.h
  opencl_gini_calculator.h

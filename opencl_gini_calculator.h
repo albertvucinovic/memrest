@@ -8,6 +8,7 @@
 #include <map>
 #include <utility>
 #include <typeinfo>
+#include <utils.h>
 
 #include <CL/cl.h>
 
@@ -45,12 +46,12 @@ class OpenCLGiniCalculator{
     }
     ~OpenCLGiniCalculator(){
       // Clean up
-      ret = clFlush(command_queue);
-      ret = clFinish(command_queue);
+      ret = clFlush(this->command_queue);
+      ret = clFinish(this->command_queue);
       //TODO:should map over all kernels
       //ret = clReleaseKernel(kernel);
       //ret = clReleaseProgram(program);
-      ret = clReleaseCommandQueue(command_queue);
+      ret = clReleaseCommandQueue(this->command_queue);
       ret = clReleaseContext(context);
     }
 
@@ -79,7 +80,7 @@ class OpenCLGiniCalculator{
         // Create a program from the kernel source
         size_t size_of_program=kernel_with_args.size();
         const char *kernel_as_c_string=kernel_with_args.c_str();
-        //printf("\"PRINTF%sPRINTF\"",kernel_as_c_string);
+        printf("\"PRINTF%sPRINTF\"",kernel_as_c_string);
         cl_program program = clCreateProgramWithSource(context, 1, 
                 (const char **)&kernel_as_c_string, (const size_t *)&size_of_program, &ret);
         cout<<"clCreateProgramWithSource"<<ret<<endl;
@@ -89,15 +90,14 @@ class OpenCLGiniCalculator{
         // Create the OpenCL kernel
         kernel = clCreateKernel(program, "gini", &ret);
         cout<<"clCreateKernel"<<ret<<endl;
-        cout<<CL_INVALID_KERNEL_NAME<<endl;
+
         kernels[matrix_dimensions]=kernel;
       }
 
- 
-      cl_mem A_mem = clCreateBuffer(context, CL_MEM_READ_ONLY || CL_MEM_COPY_HOST_PTR, 
+      cl_mem A_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
             num_features*num_samples * sizeof(T), &((*matrix)[0]), &ret);
       cout<<"clCreateBuffer A"<<ret<<endl;
-      cl_mem sample_classes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY || CL_MEM_COPY_HOST_PTR, 
+      cl_mem sample_classes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
             num_samples * sizeof(T), &((*classes)[0]), &ret);
       cout<<"clCreateBuffer sample classes"<<ret<<endl;
       cl_mem gini_res_mem = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
@@ -110,14 +110,23 @@ class OpenCLGiniCalculator{
       ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&gini_res_mem);
 
       const size_t global_work_size[]={num_features, num_samples};
-      const size_t local_work_size[]={1,num_samples};
-      ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL, 
-        global_work_size, local_work_size, 0, NULL, NULL);
+      const size_t local_work_size[]={1, num_samples};
+      cl_event kernel_event;
+      ret = clEnqueueNDRangeKernel(this->command_queue, kernel, 2, NULL, 
+        global_work_size, local_work_size, 0, NULL, &kernel_event);
+      cout<<"clEnqueueNDRangeKernel"<<ret<<endl;
 
       shared_ptr<vector<T>> result(new vector<T>(num_features*num_samples));
       //we are assuming that the vector storage is continuous as per the c++11 standard
-      ret = clEnqueueReadBuffer(command_queue, gini_res_mem, CL_TRUE, 0, 
-            num_features*num_samples * sizeof(T), &((*result)[0]), 0, NULL, NULL);
+      ret = clFinish(this->command_queue);
+      cout<<"clFinish "<<ret<<endl;
+      ret=clEnqueueBarrier(this->command_queue);
+
+      
+      T *C = (T*)malloc(sizeof(T)*num_samples*num_features);
+      ret = clEnqueueReadBuffer(this->command_queue, gini_res_mem, CL_TRUE, 0, 
+            num_features*num_samples * sizeof(T), &((*result)[0]), 1, &kernel_event, NULL);
+      cout<<"clEnqueueReadBuffer"<<ret<<endl;
 
       ret = clReleaseMemObject(A_mem);
       ret = clReleaseMemObject(sample_classes_mem);
@@ -133,6 +142,7 @@ class OpenCLGiniCalculator{
       :
       float_type(float_type)
     {
+      cout<<"OpenCLGiniCalculator constructor"<<endl;
       // Get platform and device information
       platform_id = NULL;
       device_id = NULL;   
@@ -147,8 +157,10 @@ class OpenCLGiniCalculator{
       cout<<"clCreateContext"<<ret<<endl;
    
       // Create a command queue
-      command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
+      this->command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
       cout<<"clCreateCommandQueue"<<ret<<endl;
+
+      clFinish(command_queue);
     }
 
     
@@ -164,7 +176,7 @@ class OpenCLGiniCalculator{
 const char *kernel_template=R"KERNEL(
 //we are using a hash function to collect frequency counts for classes
 //may be inacurate, but the probability for that should be low
-#define hash(k) as_int((k)) % {{prime}} % {{num_samples}}
+#define hash(k) (as_int((k)) % {{prime}} % {{num_samples}})
 
 //A is a 2d matrix, stored in rows of num_samples x num_features
 
@@ -189,16 +201,12 @@ void gini(
 
   int main_index=thread_sample*{{num_features}}+thread_feature;
 
-  
   A_local[thread_sample]=A[main_index];
-
   sample_classes_local[thread_sample]=sample_classes[thread_sample];
 
   barrier(CLK_LOCAL_MEM_FENCE);
-
   int my_classes_counts[{{num_samples}}];
   int classes_counts[{{num_samples}}*2];
-
   //initializing classes counts
   for(int i=0;i<{{num_samples}};i++){
     //classes counts for left samples
@@ -207,10 +215,10 @@ void gini(
     classes_counts[2*i+1]=0;
     my_classes_counts[i]=0;  
   }
-
   //classes counts before the split
   for(int i=0; i<{{num_samples}}; i++){
-    int hashed_index=hash(sample_classes_local[i]);
+    int k=sample_classes_local[i];
+    int hashed_index=hash(k);
     my_classes_counts[hashed_index]++;
   }
 
@@ -222,12 +230,13 @@ void gini(
   {{float_type}} right_total=0.;
   for(int i=0; i<{{num_samples}}; i++){
     //int index=i*{{num_features}}+thread_feature;
-    int hashed_index=hash(sample_classes_local[i]);
+    int k=sample_classes_local[i];
+    int hashed_index=hash(k);
     //A_local[index]>threshold returns a 0 or 1, so it increments the index for the right class
-    int class=(A_local[i]>threshold);
-    right_total=right_total+({{float_type}})class;
-    left_total=left_total+(1-({{float_type}})class);
-    classes_counts[2*hashed_index+class]++;
+    int cl=(A_local[i]>threshold);
+    right_total=right_total+({{float_type}})cl;
+    left_total=left_total+(1-({{float_type}})cl);
+    classes_counts[2*hashed_index+cl]++;
   }
 
   //now we have the counts for gini, now we compute it
@@ -254,7 +263,7 @@ void gini(
     my_gini=my_gini-current_class_probability_squared;
   }
    
-  {{float_type}} split_score=my_gini-1/{{num_samples}}*(left_total*left_gini+right_total*right_gini);
+  {{float_type}} split_score=my_gini-1/(({{float_type}}){{num_samples}})*(left_total*left_gini+right_total*right_gini);
 
   if(!isnan(split_score))
     gini_res[main_index]=split_score;
