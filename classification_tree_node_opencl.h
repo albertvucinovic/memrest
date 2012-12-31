@@ -63,6 +63,8 @@ class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTree
           left_samples->push_back(*s1);
         }
       }
+
+      //DEBUG1(cout<<"best split score:"<<best_split_score<<endl);
       return Split<T>(
         threshold, 
         best_split_feature, 

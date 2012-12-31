@@ -11,6 +11,8 @@
 #include <utility>
 #include <iostream>
 
+#include <lambda_queue.h>
+
 
 
 template <class T, class NodeType>
@@ -60,7 +62,7 @@ class OnlineRandomForestClassifier{
           unique_ptr<oob_error<T>>(new oob_error<T>(0.,0.))
         ));
     }
-    
+    parallel_queue=new lambda_queue(8,number_of_trees);
   }
 
   ~OnlineRandomForestClassifier(){}
@@ -86,8 +88,10 @@ class OnlineRandomForestClassifier{
 
   void update(shared_ptr<Sample<T>> sample){
     for(auto i=trees->begin();i!=trees->end();i++){
-      update_tree(*i, sample);
+      auto f=[this, i, sample](){ this->update_tree(*i, sample); };
+      parallel_queue->push(f);
     }
+    parallel_queue->sync();
   }
 
   pair<T,T> predict(vector<T>& sample){
@@ -105,6 +109,11 @@ class OnlineRandomForestClassifier{
     T probability=predictions_probabilities[prediction]/total_predictions;
     return pair<T,T>(prediction, probability);
   }
+
+  private:
+   
+  lambda_queue *parallel_queue;
+
 
 };
 

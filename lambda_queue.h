@@ -14,12 +14,17 @@
 
 class lambda_queue{
   public:
-  
+  int number_of_threads;
+  int work_batch_size;
+  int jobs_counter;
 
-  lambda_queue(int number_of_threads){
-    notified=false;
+  lambda_queue(int number_of_threads, int work_batch_size):
+    number_of_threads(number_of_threads), 
+    work_batch_size(work_batch_size)
+  {
+    jobs_counter=0;
     for(int i=0;i<number_of_threads;i++){
-      threads.push_back(std::thread(&lambda_queue::work, this));
+      threads.push_back(std::thread(&lambda_queue::work, this, i));
     }
   }
 
@@ -35,38 +40,50 @@ class lambda_queue{
     m.unlock();
   }
 
+  void sync(){
+    m.lock();
+    while(jobs_counter!=work_batch_size){
+      m.unlock();
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      m.lock();
+    }
+    jobs_counter=0;
+    m.unlock();
+  }
+
   private:
 
   std::queue<std::function<void()>> queue;
   std::mutex m;
-  std::condition_variable cond_var;
   std::vector<std::thread> threads;
-  bool notified;
 
-  void work_wrapper(){
+  void work_wrapper(int i){
     m.lock();
     bool locked=true;
     if(!queue.empty()){
-      std::cout<<"Thread "<<std::this_thread::get_id()<<':'<<std::endl;
       std::function<void()> job=queue.front();
       queue.pop();
       m.unlock();
-      locked=false;
       job();
+      m.lock();
+      jobs_counter+=1;
+      m.unlock();
+      locked=false;
     }
     else{
       m.unlock();
       locked=false;
-      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     if(locked){
       m.unlock();
     }
   }
 
-  void work(){
+  void work(int i){
+    cout<<"I is: "<<i<<endl;
     while(true){
-      work_wrapper();
+      work_wrapper(i);
     }
   }
 
