@@ -119,8 +119,6 @@ class DecisionTreeNode{
       if(split.score>0.){
         this->criterion_feature=split.feature;
         this->criterion_threshold=split.threshold;
-        DEBUG1(assert(split.left->size()>0);cout<<"left size:"<<split.left->size()<<endl;)
-        DEBUG1(assert(split.right->size()>0);cout<<"right size:"<<split.right->size()<<endl;)
         this->left.reset(
           new Node(
             this->number_of_features,

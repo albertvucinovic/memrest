@@ -111,7 +111,7 @@ class OpenCLGiniCalculator{
 
       shared_ptr<vector<T>> result(new vector<T>(num_features*num_samples));
       //we are assuming that the vector storage is continuous as per the c++11 standard
-      ret=clEnqueueBarrier(this->command_queue);
+      //ret=clEnqueueBarrier(this->command_queue);
 
       
       T *C = (T*)malloc(sizeof(T)*num_samples*num_features);
@@ -136,14 +136,14 @@ class OpenCLGiniCalculator{
       platform_id = NULL;
       device_id = NULL;   
       ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-      ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_DEFAULT, 1, 
+      ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_GPU, 1, 
               &device_id, &ret_num_devices);
    
       // Create an OpenCL context
       context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
    
       // Create a command queue
-      this->command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
+      this->command_queue = clCreateCommandQueue(context, device_id, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &ret);
 
       clFinish(command_queue);
     }
