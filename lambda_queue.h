@@ -44,7 +44,7 @@ class lambda_queue{
     m.lock();
     while(jobs_counter!=work_batch_size){
       m.unlock();
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      std::this_thread::sleep_for(std::chrono::milliseconds(0));
       m.lock();
     }
     jobs_counter=0;
