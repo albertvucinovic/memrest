@@ -11,10 +11,11 @@ void test(void (*f)(), string name){
 }
 
 void test_basic_functionality(){
-  lambda_queue queue(5);
+  int num_tasks=4000;
+  lambda_queue queue(5, num_tasks);
   vector<function<void()>> pushed;
 
-  for(int i=0;i<4000;i++){
+  for(int i=0;i<num_tasks;i++){
     auto a=[=](){cout<<"Work item number "<<i<<endl;};
     queue.push(a);
   }

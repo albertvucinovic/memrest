@@ -62,7 +62,7 @@ class OnlineRandomForestClassifier{
           unique_ptr<oob_error<T>>(new oob_error<T>(0.,0.))
         ));
     }
-    parallel_queue=new lambda_queue(8,number_of_trees);
+    parallel_queue=new lambda_queue(16,number_of_trees);
   }
 
   ~OnlineRandomForestClassifier(){}

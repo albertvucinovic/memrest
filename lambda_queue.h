@@ -81,7 +81,7 @@ class lambda_queue{
   }
 
   void work(int i){
-    cout<<"I is: "<<i<<endl;
+    std::cout<<"I is: "<<i<<std::endl;
     while(true){
       work_wrapper(i);
     }
