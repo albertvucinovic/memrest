@@ -10,7 +10,13 @@
 #include <vector>
 #include <iostream>
 #include <map>
-using namespace std;
+#include <utility>
+using std::vector;
+using std::map;
+using std::cout;
+using std::endl;
+using std::pair;
+
 namespace utils{
 template<class T>
 vector<T> subsample(vector<T>& v, vector<int>& indices){

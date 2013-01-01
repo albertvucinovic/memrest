@@ -8,8 +8,11 @@
 #include <cstdlib>
 #include <set>
 #include <utility>
-#include <cassert>
-using namespace std;
+using std::shared_ptr;
+using std::unique_ptr;
+using std::set;
+using std::vector;
+
 
 #define DEBUG_LEVEL 1
 

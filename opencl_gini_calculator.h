@@ -1,7 +1,6 @@
 #ifndef GINI_OPENCL
 #define GINI_OPENCL
 
-#include <iostream>
 #include <cstdio>
 #include <string>
 #include <ctemplate/template.h>
@@ -12,7 +11,11 @@
 
 #include <CL/cl.h>
 
-using namespace std;
+using std::string;
+using std::map;
+using std::pair;
+using std::printf;
+using std::to_string;
 
 //For getting the typename T into the OpenCL kernel
 template<typename T>
@@ -75,7 +78,6 @@ class OpenCLGiniCalculator{
         std::string kernel_with_args;
         ctemplate::StringToTemplateCache("kernel", kernel_template, ctemplate::DO_NOT_STRIP);
         ctemplate::ExpandTemplate("kernel", ctemplate::DO_NOT_STRIP, &dict, &kernel_with_args);
-        //std::cout << kernel_with_args;
 
         // Create a program from the kernel source
         size_t size_of_program=kernel_with_args.size();

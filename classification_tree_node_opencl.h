@@ -5,7 +5,10 @@
 #include <opencl_gini_calculator.h>
 #include <utils.h>
 #include <iostream>
-using namespace std;
+#include <memory>
+using std::shared_ptr;
+using std::vector;
+using std::pair;
 
 template<class T>
 class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTreeNodeOpenCL<T>>{

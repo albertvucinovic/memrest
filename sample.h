@@ -2,8 +2,8 @@
 #define SAMPLE_H
 
 #include <vector>
-#include <iostream>
-using namespace std;
+using std::vector;
+
 template<class T> 
 class Sample{
   public:

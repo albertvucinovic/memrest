@@ -8,6 +8,12 @@
 #include <sstream>
 #include <map>
 #include <memory>
+using std::vector;
+using std::ifstream;
+using std::map;
+using std::pair;
+using std::ios;
+using std::istringstream;
 
 template<class T>
 vector<shared_ptr<Sample<T>>> read_svm_data(string filename){

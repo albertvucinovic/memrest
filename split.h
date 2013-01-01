@@ -4,6 +4,8 @@
 #include <sample.h>
 
 #include <memory>
+using std::shared_ptr;
+using std::vector;
 
 template<class T>
 struct Split{
