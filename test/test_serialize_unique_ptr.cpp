@@ -13,6 +13,8 @@ using std::string;
 #include <fstream>
 using std::ifstream;
 using std::ofstream;
+#include <memory>
+using std::unique_ptr;
 
 
 class A{
@@ -54,6 +56,27 @@ void test_normal_serialize(){
 }
 
 void test_unique_ptr_serialize(){
+  const char *fname="test_serialization.cpkl";
+
+  std::ofstream ofs(fname);
+  boost::archive::text_oarchive ar(ofs);
+
+  unique_ptr<A> p(new A("Trying serialization with unique_ptr"));
+ 
+  cout<<p->message<<endl;
+
+  ar & p;
+  ofs.close();
+  
+  unique_ptr<A> p_restored;
+
+  std::ifstream ifs(fname);
+  boost::archive::text_iarchive iar(ifs);
+
+  iar & p_restored;
+
+  cout<<p_restored->message<<endl;
+
 }
 
 int main(){
