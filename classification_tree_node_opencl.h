@@ -21,6 +21,12 @@ template<class T>
 class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTreeNodeOpenCL<T>>{
   public:
     OpenCLGiniCalculator<T> *gini_calc;
+    ClassificationTreeNodeOpenCL():
+      DecisionTreeNode<T, ClassificationTreeNodeOpenCL<T>>()
+    {
+      gini_calc=OpenCLGiniCalculator<T>::get_instance();
+    }
+
     ClassificationTreeNodeOpenCL(
       int number_of_features,
       int number_of_decision_functions,

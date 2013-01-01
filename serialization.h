@@ -83,6 +83,27 @@ void serialize(Archive& ar, ClassificationTreeNode<T>& dtn, const unsigned int v
 }
 /////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////
+//serialization for ClassificationTreeNodeOpenCL<T>
+template<typename Archive, class T>
+void serialize(Archive& ar, ClassificationTreeNodeOpenCL<T>& dtn, const unsigned int version){
+  ar & dtn.number_of_features;
+  ar & dtn.number_of_decision_functions;
+  ar & dtn.min_samples_to_split;
+  ar & dtn.max_samples_to_hold;
+  ar & dtn.max_tree_depth;
+  ar & dtn.samples;
+  ar & dtn.left;
+  ar & dtn.right;
+  ar & dtn.randomly_selected_features;
+  ar & dtn.criterion_feature;
+  ar & dtn.criterion_threshold;
+  ar & dtn.frozen_prediction;
+  ar & dtn.prediction_frozen;
+}
+/////////////////////////////////////////////////////////////
+
+
 
 } // namespace serialization
 } // namespace boost
