@@ -17,7 +17,7 @@
 
 template <class T, class NodeType>
 class OnlineRandomForestClassifier{
-  typedef pair<unique_ptr<NodeType>,unique_ptr<oob_error<T>>> TreeNodeOOB;
+  typedef pair<shared_ptr<NodeType>,shared_ptr<oob_error<T>>> TreeNodeOOB;
 
   public:
   
@@ -54,7 +54,7 @@ class OnlineRandomForestClassifier{
       shared_ptr<vector<shared_ptr<Sample<T>>>> initial_samples(new vector<shared_ptr<Sample<T>>>());
       trees->push_back(
         TreeNodeOOB(
-          unique_ptr<NodeType>(new NodeType(
+          shared_ptr<NodeType>(new NodeType(
             number_of_features,
             number_of_decision_functions,
             min_samples_to_split,
@@ -62,10 +62,10 @@ class OnlineRandomForestClassifier{
             max_tree_depth,
             initial_samples
           )),
-          unique_ptr<oob_error<T>>(new oob_error<T>(0.,0.))
+          shared_ptr<oob_error<T>>(new oob_error<T>(0.,0.))
         ));
     }
-    parallel_queue=new lambda_queue(16,number_of_trees);
+    parallel_queue=new lambda_queue(NUMBER_OF_THREADS,number_of_trees);
   }
 
   ~OnlineRandomForestClassifier(){}

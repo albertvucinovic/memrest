@@ -4,14 +4,25 @@
 #include <online_random_forest_classifier.h>
 #include "data.h"
 
+#include <serialization.h>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
+
+
 #include <iostream>
+using std::cout;
+using std::endl;
 #include <vector>
+using std::vector;
 #include <cassert>
 #include <memory>
 #include <map>
-using std::cout;
-using std::vector;
 using std::map;
+#include <fstream>
+using std::ifstream;
+using std::ofstream;
+
 
 
 #ifdef BOOST_MEM
@@ -190,6 +201,53 @@ void test_online_random_forest(){
   }
   utils::print(predictions);
   cout<<"Test correct percentage:"<<correct/total<<endl;
+
+  const char *fname="test_serialization.cpkl";
+
+  std::ofstream ofs(fname);
+  boost::archive::text_oarchive ar(ofs);
+
+  ar & rf;
+  ofs.close();
+  
+  OnlineRandomForestClassifier<float, ClassificationTreeNodeOpenCL<float>> rf_restored;
+
+  std::ifstream ifs(fname);
+  boost::archive::text_iarchive iar(ifs);
+
+  iar & rf_restored;
+
+  //TODO: test with the test set
+  cout<<"Predicting training .."<<endl;
+  data=read_svm_data<float>("../../forex/data/libsvm/dna.scale.tr");
+  predictions.clear();
+  correct=0.;
+  total=data.size();
+  for(auto i=data.begin();i!=data.end();i++){
+    pair<float,float> result=rf_restored.predict((*i)->features);
+    predictions.push_back(result.first);
+    if(result.first==(*i)->prediction){
+      correct+=1;
+    }
+  }
+  utils::print(predictions);
+  cout<<"Training correct percentage:"<<correct/total<<endl;
+
+  cout<<"Predicting test .."<<endl;
+  data=read_svm_data<float>("../../forex/data/libsvm/dna.scale.t");
+  total=data.size();
+  predictions.clear();
+  correct=0;
+  for(auto i=data.begin();i!=data.end();i++){
+    pair<float,float> result=rf_restored.predict((*i)->features);
+    predictions.push_back(result.first);
+    if(result.first==(*i)->prediction){
+      correct+=1;
+    }
+  }
+  utils::print(predictions);
+  cout<<"Test correct percentage:"<<correct/total<<endl;
+
 
 
 
