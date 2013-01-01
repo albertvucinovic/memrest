@@ -1,22 +1,18 @@
-#ifndef SERIALIZE_UNIQUE_PTR
-#define SERIALIZE_UNIQUE_PTR
-
-/////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
-// Created by modifying demo_auto_ptr.cpp made by Robert Ramney from the boost library.
-// (C) Copyright Albert Vucinovic
-
+#ifndef SERIALIZATION_H
+#define SERIALIZATION_H
 #include <memory>
 
 #include <boost/config.hpp>
-
-
 #include <boost/serialization/split_free.hpp>
+#include <boost/serialization/vector.hpp>
+
+#include <sample.h>
 
 namespace boost { 
 namespace serialization {
 
 /////////////////////////////////////////////////////////////
-// implement serialization for auto_ptr< T >
+// implement serialization for unique_ptr< T >
 // note: this must be added to the boost namespace in order to
 // be called by the library
 template<class Archive, class T>
@@ -52,8 +48,19 @@ inline void serialize(
 ){
     boost::serialization::split_free(ar, t, file_version);
 }
+/////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////
+//implement serialization for the Sample<T> class
+template<typename Archive, class T>
+void serialize(Archive& ar, Sample<T> sample, const unsigned int version) {
+  ar & sample.prediction & sample.features;
+}
+/////////////////////////////////////////////////////////////
+
 
 } // namespace serialization
 } // namespace boost
 
-#endif //SERIALIZE_UNIQUE_PTR
+#endif

@@ -1,4 +1,4 @@
-#include <serialize_unique_ptr.h>
+#include <serialization.h>
 #include <test.h>
 
 #include <boost/archive/tmpdir.hpp>
