@@ -13,6 +13,10 @@
 template<class T>
 class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T>>{
   public:
+    ClassificationTreeNode():
+      DecisionTreeNode<T, ClassificationTreeNode<T>>()
+    {}
+    
     ClassificationTreeNode(
       int number_of_features,
       int number_of_decision_functions,

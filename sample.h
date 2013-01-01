@@ -9,6 +9,7 @@ class Sample{
   public:
     vector<T> features;
     T prediction;
+    Sample(){}
     Sample(vector<T> features, T prediction):
       features(features),
       prediction(prediction){}

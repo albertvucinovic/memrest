@@ -5,8 +5,12 @@
 #include <boost/config.hpp>
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/utility.hpp>//serialization for pair<K,V>
+#include <boost/serialization/set.hpp>
 
 #include <sample.h>
+#include <classification_tree_node.h>
 
 namespace boost { 
 namespace serialization {
@@ -54,8 +58,28 @@ inline void serialize(
 /////////////////////////////////////////////////////////////
 //implement serialization for the Sample<T> class
 template<typename Archive, class T>
-void serialize(Archive& ar, Sample<T> sample, const unsigned int version) {
+void serialize(Archive& ar, Sample<T>& sample, const unsigned int version) {
   ar & sample.prediction & sample.features;
+}
+/////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////
+//serialization for ClassificationTreeNode<T>
+template<typename Archive, class T>
+void serialize(Archive& ar, ClassificationTreeNode<T>& dtn, const unsigned int version){
+  ar & dtn.number_of_features;
+  ar & dtn.number_of_decision_functions;
+  ar & dtn.min_samples_to_split;
+  ar & dtn.max_samples_to_hold;
+  ar & dtn.max_tree_depth;
+  ar & dtn.samples;
+  ar & dtn.left;
+  ar & dtn.right;
+  ar & dtn.randomly_selected_features;
+  ar & dtn.criterion_feature;
+  ar & dtn.criterion_threshold;
+  ar & dtn.frozen_prediction;
+  ar & dtn.prediction_frozen;
 }
 /////////////////////////////////////////////////////////////
 

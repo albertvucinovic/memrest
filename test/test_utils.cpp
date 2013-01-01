@@ -64,12 +64,9 @@ void test_shared_pointer(){
   sp1.reset();
   cout<<"5"<<endl;
 
-
   unique_ptr<Proba> p;
   p.reset(new Proba());
   p.reset();
-
-
 
   shared_ptr<float> z(new float[5]);
   float* pf=z.get();

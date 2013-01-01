@@ -6,8 +6,13 @@
 
 #include <cstdlib>
 #include <set>
+using std::set;
 #include <utility>
+using std::pair;
 #include <memory>
+using std::unique_ptr;
+#include <vector>
+using std::vector;
 
 #ifdef BOOST_MEM
 #include <boost/shared_ptr.hpp>
@@ -16,9 +21,6 @@ using boost::shared_ptr;
 using std::shared_ptr;
 #endif
 
-using std::unique_ptr;
-using std::set;
-using std::vector;
 
 
 
@@ -45,6 +47,7 @@ class DecisionTreeNode{
     pair<T,T> frozen_prediction;
     bool prediction_frozen;
 
+    DecisionTreeNode(){}
 
     DecisionTreeNode(
       int number_of_features,
