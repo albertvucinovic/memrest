@@ -2,9 +2,15 @@
 #define SPLIT_H
 
 #include <sample.h>
-
 #include <memory>
+
+#ifdef BOOST_MEM
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+#else
 using std::shared_ptr;
+#endif
+
 using std::vector;
 
 template<class T>

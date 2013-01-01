@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #define DEBUG_LEVEL 0
+//#define BOOST_MEM
 
 #define TYPE "float"
 

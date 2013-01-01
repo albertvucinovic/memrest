@@ -9,7 +9,19 @@
 #include <cassert>
 #include <memory>
 #include <map>
-using namespace std;
+using std::cout;
+using std::vector;
+using std::map;
+
+
+#ifdef BOOST_MEM
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+#else
+using std::shared_ptr;
+#endif
+
+
 
 void test(void (*f)(), string name){
   cout<<"Testing "<<name<<endl;

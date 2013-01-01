@@ -4,17 +4,23 @@
 #include <sample.h>
 #include <split.h>
 
-#include <memory>
 #include <cstdlib>
 #include <set>
 #include <utility>
+#include <memory>
+
+#ifdef BOOST_MEM
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+#else
 using std::shared_ptr;
+#endif
+
 using std::unique_ptr;
 using std::set;
 using std::vector;
 
 
-#define DEBUG_LEVEL 1
 
 //T should be float or double
 template <class T, class Node>
