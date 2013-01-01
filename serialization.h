@@ -13,6 +13,8 @@
 #include <classification_tree_node.h>
 #include <classification_tree_node_opencl.h>
 #include <oob_error.h>
+#include <lambda_queue.h>
+#include <online_random_forest_classifier.h>
 
 namespace boost { 
 namespace serialization {
@@ -106,12 +108,53 @@ void serialize(Archive& ar, ClassificationTreeNodeOpenCL<T>& dtn, const unsigned
 /////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////
+//serialize oob_error<T>
 template<typename  Archive, class T>
 void serialize(Archive& ar, oob_error<T>& oob, const unsigned int version){
   ar & oob.oob_absolute_error;
   ar & oob.oob_samples_count;
 }
 /////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////
+//serialize OnlineRandomForestClassifier<T, NodeType>
+template<typename  Archive, class T, class NodeType>
+void save(Archive& ar, OnlineRandomForestClassifier<T, NodeType>& forest, const unsigned int version){
+  ar << forest.number_of_trees;
+  ar << forest.number_of_features;
+  ar << forest.number_of_decision_functions;
+  ar << forest.min_samples_to_split;
+  ar << forest.max_samples_to_hold;
+  ar << forest.max_tree_depth;
+  
+  ar << forest.trees;
+}
+
+template<typename  Archive, class T, class NodeType>
+void load(Archive& ar, OnlineRandomForestClassifier<T, NodeType>& forest, const unsigned int version){
+  ar >> forest.number_of_trees;
+  ar >> forest.number_of_features;
+  ar >> forest.number_of_decision_functions;
+  ar >> forest.min_samples_to_split;
+  ar >> forest.max_samples_to_hold;
+  ar >> forest.max_tree_depth;
+  
+  ar >> forest.trees;
+
+  forest.parallel_queue=new lambda_queue(NUMBER_OF_THREADS, forest.number_of_trees);
+}
+
+template<typename  Archive, class T, class NodeType>
+void serialize(Archive& ar, OnlineRandomForestClassifier<T, NodeType>& forest, const unsigned int file_version){
+  boost::serialization::split_free(ar, forest, file_version);
+}
+
+/////////////////////////////////////////////////////////////
+
+
+
+
 
 
 } // namespace serialization

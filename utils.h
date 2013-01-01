@@ -2,7 +2,8 @@
 #define UTILS_H
 
 #define DEBUG_LEVEL 0
-//#define BOOST_MEM
+#define BOOST_MEM
+#define NUMBER_OF_THREADS 16
 
 #define TYPE "float"
 

@@ -30,7 +30,10 @@ class OnlineRandomForestClassifier{
 
   unique_ptr<vector<TreeNodeOOB>> trees;
 
-  
+  lambda_queue *parallel_queue;
+
+  OnlineRandomForestClassifier(){}
+
   OnlineRandomForestClassifier(
     int number_of_trees,
     int number_of_features,
@@ -112,7 +115,6 @@ class OnlineRandomForestClassifier{
 
   private:
    
-  lambda_queue *parallel_queue;
 
 
 };
