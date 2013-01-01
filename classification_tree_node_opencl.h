@@ -14,7 +14,9 @@ using boost::shared_ptr;
 using std::shared_ptr;
 #endif
 
+#include <vector>
 using std::vector;
+#include <utility>
 using std::pair;
 
 template<class T>
