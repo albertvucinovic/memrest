@@ -11,6 +11,8 @@
 
 #include <sample.h>
 #include <classification_tree_node.h>
+#include <classification_tree_node_opencl.h>
+#include <oob_error.h>
 
 namespace boost { 
 namespace serialization {
@@ -103,6 +105,13 @@ void serialize(Archive& ar, ClassificationTreeNodeOpenCL<T>& dtn, const unsigned
 }
 /////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////
+template<typename  Archive, class T>
+void serialize(Archive& ar, oob_error<T>& oob, const unsigned int version){
+  ar & oob.oob_absolute_error;
+  ar & oob.oob_samples_count;
+}
+/////////////////////////////////////////////////////////////
 
 
 } // namespace serialization
