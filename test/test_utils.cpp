@@ -166,17 +166,18 @@ void test_online_random_forest(){
     90, //max samples to hold
     20//max depth
     );
-  for(auto i=data.begin();i!=data.end();i++){
+  float total=data.size();
+  int data_index=0;
+  for(;data_index<total/10;data_index++){
   //  utils::print((*i)->features);
   //  cout<<endl<<"Prediction:"<<(*i)->prediction<<endl;
-    rf.update(*i);
+    rf.update(data[data_index]);
   }
 
   //TODO: test with the test set
   cout<<"Predicting training .."<<endl;
   vector<float> predictions;
   float correct=0.;
-  float total=data.size();
   for(auto i=data.begin();i!=data.end();i++){
     pair<float,float> result=rf.predict((*i)->features);
     predictions.push_back(result.first);
@@ -247,6 +248,46 @@ void test_online_random_forest(){
   }
   utils::print(predictions);
   cout<<"Test correct percentage:"<<correct/total<<endl;
+
+  
+  data=read_svm_data<float>("../../forex/data/libsvm/dna.scale.tr");
+  //feeding the other half of training data
+  for(;data_index<total;data_index++){
+  //  utils::print((*i)->features);
+  //  cout<<endl<<"Prediction:"<<(*i)->prediction<<endl;
+    rf_restored.update(data[data_index]);
+  }
+
+  cout<<"Predicting training .."<<endl;
+  predictions.clear();
+  correct=0.;
+  total=data.size();
+  for(auto i=data.begin();i!=data.end();i++){
+    pair<float,float> result=rf_restored.predict((*i)->features);
+    predictions.push_back(result.first);
+    if(result.first==(*i)->prediction){
+      correct+=1;
+    }
+  }
+  utils::print(predictions);
+  cout<<"Training correct percentage:"<<correct/total<<endl;
+
+  cout<<"Predicting test .."<<endl;
+  data=read_svm_data<float>("../../forex/data/libsvm/dna.scale.t");
+  total=data.size();
+  predictions.clear();
+  correct=0;
+  for(auto i=data.begin();i!=data.end();i++){
+    pair<float,float> result=rf_restored.predict((*i)->features);
+    predictions.push_back(result.first);
+    if(result.first==(*i)->prediction){
+      correct+=1;
+    }
+  }
+  utils::print(predictions);
+  cout<<"Test correct percentage:"<<correct/total<<endl;
+
+ 
 
 
 
