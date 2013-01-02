@@ -1,13 +1,18 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 1
 #define BOOST_MEM
 #define NUMBER_OF_THREADS 16
 
 #define TYPE "float"
 
-#define DEBUG1(T) if( DEBUG_LEVEL >=1) T;
+#if DEBUG_LEVEL>0
+#define DEBUG1(T) T;
+#else
+#define DEBUG1(T) ;
+#endif
+
 
 #include <vector>
 #include <iostream>

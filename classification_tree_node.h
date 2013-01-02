@@ -48,17 +48,10 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
       T right_gini=utils::gini(right);
       float total=(float)my_predictions.size();
       T score= my_error-1/total*(left_gini*left.size()+right_gini*right.size());
-      //cout<<"left size:"<<left.size()<<endl;
-      //cout<<"left gini:"<<left_gini<<endl;
-      //cout<<"right size:"<<right.size()<<endl;
-      //cout<<"right gini:"<<right_gini<<endl;
-      //cout<<"my error:"<<my_error<<endl;
-      //cout<<"score:"<<score<<endl;
       return score;
     }
 
     virtual Split<T> find_best_split(){
-      //find the best split
       T best_split_score=0;
       T best_split_threshold=0.;
       int best_split_feature=-1;
@@ -69,7 +62,6 @@ class ClassificationTreeNode:public DecisionTreeNode<T, ClassificationTreeNode<T
         for(auto f=this->randomly_selected_features->begin();f!=this->randomly_selected_features->end();f++){
           vector<T> v=(*s)->features;
           T threshold=v[*f];
-          //cout<<"threshold:"<<threshold<<endl;
           shared_ptr<vector<shared_ptr<Sample<T>>>> left_samples(new vector<shared_ptr<Sample<T>>>());
           vector<T> left;
           shared_ptr<vector<shared_ptr<Sample<T>>>> right_samples(new vector<shared_ptr<Sample<T>>>());

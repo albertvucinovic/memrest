@@ -82,7 +82,7 @@ class ClassificationTreeNodeOpenCL:public DecisionTreeNode<T, ClassificationTree
         }
       }
 
-      //DEBUG1(cout<<"best split score:"<<best_split_score<<endl);
+      DEBUG1(cout<<"best split score:"<<best_split_score<<endl);
       return Split<T>(
         threshold, 
         best_split_feature, 
