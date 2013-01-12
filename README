@@ -1,0 +1,12 @@
+Memory efficient online random forest.
+
+INSTALL
+  Depends on:
+    ctemplate 
+      google library for templating
+      the revision 129 is needed because it works with c++11
+    opencl
+      ati or nvidia libraries
+    c++11
+    boost::serialization
+    boost::shared_ptr

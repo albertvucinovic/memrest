@@ -1,0 +1,11 @@
+Create A OnlineRandomForestClassifier class with bad oob error tree droping.
+
+###REGRESSION###
+Create RegressionTreeNode class.
+Create OnlineRandomForestRegressor.
+Test OnlineRandomForestRegressor.
+Create RegressionTreeNodeOpenCL.
+Create OnlineRandomForestRegressorOpenCL.
+Test OnlineRandomForestRegressorOpenCL.
+
+
