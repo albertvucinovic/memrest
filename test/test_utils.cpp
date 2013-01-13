@@ -1,4 +1,5 @@
 #include <utils.h>
+using utils::test;
 #include <sample.h>
 #include <classification_tree_node_opencl.h>
 #include <online_random_forest_classifier.h>
@@ -33,12 +34,6 @@ using std::shared_ptr;
 #endif
 
 
-
-void test(void (*f)(), string name){
-  cout<<"Testing "<<name<<endl;
-  f();
-  cout<<"Testing "<<name<<" finished."<<endl<<endl;
-}
 
 
 class Proba{

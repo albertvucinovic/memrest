@@ -1,7 +1,8 @@
 #define BOOST_MEM
 
 #include <serialization.h>
-#include <test.h>
+#include <utils.h>
+using utils::test;
 #include <sample.h>
 #include <decision_tree_node.h>
 

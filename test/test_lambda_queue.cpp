@@ -1,14 +1,10 @@
 #include <lambda_queue.h>
 #include <iostream>
 #include <functional>
+#include <utils.h>
+using utils::test;
 
 using namespace std;
-
-void test(void (*f)(), string name){
-  cout<<"Testing "<<name<<endl;
-  f();
-  cout<<"Testing "<<name<<" finished."<<endl<<endl;
-}
 
 void test_basic_functionality(){
   int num_tasks=4000;

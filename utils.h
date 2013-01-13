@@ -23,6 +23,8 @@ using std::map;
 using std::cout;
 using std::endl;
 using std::pair;
+#include <string>
+using std::string;
 
 namespace utils{
 template<class T>
@@ -119,6 +121,12 @@ vector<T> derivate(vector<T> v){
   return temp;
 }
 
+
+void test(void (*f)(), string name){
+  cout<<"Testing "<<name<<endl;
+  f();
+  cout<<"Testing "<<name<<" finished."<<endl<<endl;
+}
 
 }
 
