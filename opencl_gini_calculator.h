@@ -95,6 +95,9 @@ class OpenCLGiniCalculator{
         kernels[matrix_dimensions]=kernel;
       }
 
+      //TODO: Make this a two step process
+      //cl_mem CT = clCreateImage3D(Context, CL_MEM_READ_ONLY , Volume_format, X, Y, Z, 0, 0, 0, &error);
+      //error = clEnqueueWriteImage(CommandQue, CT, CL_TRUE, origin, region, rowPitch, slicePitch, sourceData, 0, 0, 0);
       cl_mem A_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
             num_features*num_samples * sizeof(T), &((*matrix)[0]), &ret);
       cl_mem sample_classes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
@@ -149,7 +152,6 @@ class OpenCLGiniCalculator{
       // Create a command queue
       this->command_queue = clCreateCommandQueue(context, device_id, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &ret);
 
-      clFinish(command_queue);
     }
 
     
