@@ -28,7 +28,7 @@ class OnlineRandomForestClassifier{
   int max_samples_to_hold;
   int max_tree_depth;
 
-  unique_ptr<vector<TreeNodeOOB>> trees;
+  shared_ptr<vector<TreeNodeOOB>> trees;
 
   lambda_queue *parallel_queue;
 

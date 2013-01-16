@@ -35,17 +35,19 @@ template<typename T>
 class OpenCLGiniCalculator{
   public:
 
-    static bool created;
+    static int created;
+    static int turn;
 
     string float_type=TypeParseTraits<T>::name;//"float" or "double"
     map<pair<int,int>, cl_kernel> kernels;
     
     static OpenCLGiniCalculator* get_instance(){
-      if(!created){
-        OpenCLGiniCalculator::single=new OpenCLGiniCalculator(TypeParseTraits<T>::name);
-        OpenCLGiniCalculator::created=true;
+      if(OpenCLGiniCalculator::created<NUMBER_OF_OPENCL_CONTEXTS){
+        OpenCLGiniCalculator::single[OpenCLGiniCalculator::turn]=new OpenCLGiniCalculator(TypeParseTraits<T>::name);
+        OpenCLGiniCalculator::created++;
       }
-      return OpenCLGiniCalculator::single;
+      OpenCLGiniCalculator::turn++;
+      return OpenCLGiniCalculator::single[(OpenCLGiniCalculator::turn-1)%NUMBER_OF_OPENCL_CONTEXTS];
     }
     ~OpenCLGiniCalculator(){
       // Clean up
@@ -128,7 +130,7 @@ class OpenCLGiniCalculator{
     }
 
   private:
-    static OpenCLGiniCalculator *single;
+    static OpenCLGiniCalculator *single[NUMBER_OF_OPENCL_CONTEXTS];
 
     OpenCLGiniCalculator(string float_type)
       :
@@ -263,10 +265,13 @@ void gini(
 };
 
 template<typename T>
-bool OpenCLGiniCalculator<T>::created=false;
+int OpenCLGiniCalculator<T>::created=0;
 
 template<typename T>
-OpenCLGiniCalculator<T> *OpenCLGiniCalculator<T>::single=NULL;
+int OpenCLGiniCalculator<T>::turn=0;
+
+template<typename T>
+OpenCLGiniCalculator<T> *OpenCLGiniCalculator<T>::single[NUMBER_OF_OPENCL_CONTEXTS];
 
 
 

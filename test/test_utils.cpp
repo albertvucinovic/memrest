@@ -1,5 +1,6 @@
 #include <utils.h>
 using utils::test;
+#define NUMBER_OF_THREADS 8
 #include <sample.h>
 #include <classification_tree_node_opencl.h>
 #include <online_random_forest_classifier.h>
