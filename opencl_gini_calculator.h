@@ -29,7 +29,10 @@ REGISTER_PARSE_TYPE(float);
 REGISTER_PARSE_TYPE(double);
 //END For getting the typename T into the OpenCL kernel
 
-
+#define CHECK_RET \
+  if((ret)!=0){\
+    throw "OpenCL error";\
+  }
 
 template<typename T>
 class OpenCLGiniCalculator{
@@ -89,6 +92,7 @@ class OpenCLGiniCalculator{
         printf("\"PRINTF%sPRINTF\"",kernel_as_c_string);
         cl_program program = clCreateProgramWithSource(context, 1, 
                 (const char **)&kernel_as_c_string, (const size_t *)&size_of_program, &ret);
+        CHECK_RET
         // Build the program
         ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
         // Create the OpenCL kernel
@@ -102,34 +106,44 @@ class OpenCLGiniCalculator{
       //error = clEnqueueWriteImage(CommandQue, CT, CL_TRUE, origin, region, rowPitch, slicePitch, sourceData, 0, 0, 0);
       cl_mem A_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
             num_features*num_samples * sizeof(T), &((*matrix)[0]), &ret);
+      CHECK_RET
       cl_mem sample_classes_mem = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
             num_samples * sizeof(T), &((*classes)[0]), &ret);
+      CHECK_RET
       cl_mem gini_res_mem = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
             num_features*num_samples * sizeof(T), NULL, &ret);
+      CHECK_RET
 
       // Set the arguments of the kernel
       ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&A_mem);
+      CHECK_RET
       ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&sample_classes_mem);
+      CHECK_RET
       ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&gini_res_mem);
+      CHECK_RET
 
       const size_t global_work_size[]={num_features, num_samples};
       const size_t local_work_size[]={1, num_samples};
       cl_event kernel_event;
       ret = clEnqueueNDRangeKernel(this->command_queue, kernel, 2, NULL, 
         global_work_size, local_work_size, 0, NULL, &kernel_event);
+      CHECK_RET
 
       shared_ptr<vector<T>> result(new vector<T>(num_features*num_samples));
       //we are assuming that the vector storage is continuous as per the c++11 standard
       //ret=clEnqueueBarrier(this->command_queue);
 
       
-      T *C = (T*)malloc(sizeof(T)*num_samples*num_features);
       ret = clEnqueueReadBuffer(this->command_queue, gini_res_mem, CL_TRUE, 0, 
             num_features*num_samples * sizeof(T), &((*result)[0]), 1, &kernel_event, NULL);
+      CHECK_RET
 
       ret = clReleaseMemObject(A_mem);
+      CHECK_RET
       ret = clReleaseMemObject(sample_classes_mem);
+      CHECK_RET
       ret = clReleaseMemObject(gini_res_mem);
+      CHECK_RET
 
       return result;
     }
