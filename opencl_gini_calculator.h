@@ -47,7 +47,9 @@ class OpenCLGiniCalculator{
         OpenCLGiniCalculator::created++;
       }
       OpenCLGiniCalculator::turn++;
-      return OpenCLGiniCalculator::single[(OpenCLGiniCalculator::turn-1)%NUMBER_OF_OPENCL_CONTEXTS];
+      int instance_num=(OpenCLGiniCalculator::turn-1)%NUMBER_OF_OPENCL_CONTEXTS;
+      //cout<<"Getting instance num "<<instance_num<<endl;
+      return OpenCLGiniCalculator::single[instance_num];
     }
     ~OpenCLGiniCalculator(){
       // Clean up
