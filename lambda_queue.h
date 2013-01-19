@@ -42,7 +42,10 @@ class lambda_queue{
 
   void sync(){
     m.lock();
-    while(jobs_counter!=work_batch_size){
+    while(true){
+      if(jobs_counter==work_batch_size){
+        break;
+      }
       m.unlock();
       std::this_thread::sleep_for(std::chrono::milliseconds(0));
       m.lock();
