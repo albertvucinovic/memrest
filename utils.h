@@ -122,6 +122,18 @@ vector<T> derivate(vector<T> v){
   return temp;
 }
 
+template<class T>
+vector<T> quadratize(vector<T> v){
+  vector<T> temp;
+  for(int i=0;i<v.size();i++){
+    temp.push_back(v[i]);
+    for(int j=i;j<v.size();j++){
+      temp.push_back(v[i]*v[j]);
+    }
+  }
+  return temp;
+}
+
 
 void test(void (*f)(), string name){
   cout<<"Testing "<<name<<endl;
