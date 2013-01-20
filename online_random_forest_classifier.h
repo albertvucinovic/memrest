@@ -90,11 +90,16 @@ class OnlineRandomForestClassifier{
   }
 
   void update(shared_ptr<Sample<T>> sample){
-    for(auto i=trees->begin();i!=trees->end();i++){
-      auto f=[this, i, sample](){ this->update_tree(*i, sample); };
-      parallel_queue->push(f);
+      for(auto i=trees->begin();i!=trees->end();i++){
+        auto f=[this, i, sample](){ this->update_tree(*i, sample); };
+        parallel_queue->push(f);
+      }
+      parallel_queue->sync();
+  }
+  void update(shared_ptr<Sample<T>> sample,int times){
+    for(int k=0;k<times;k++){
+        update(sample);
     }
-    parallel_queue->sync();
   }
 
   pair<T,T> predict(vector<T>& sample){
