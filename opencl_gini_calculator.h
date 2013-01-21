@@ -89,7 +89,8 @@ class OpenCLGiniCalculator{
         // Create a program from the kernel source
         size_t size_of_program=kernel_with_args.size();
         const char *kernel_as_c_string=kernel_with_args.c_str();
-        printf("\"PRINTF%sPRINTF\"",kernel_as_c_string);
+        //printf("\"PRINTF%sPRINTF\"",kernel_as_c_string);
+        printf("Generating kernel of dimension %d,%d\n", matrix_dimensions.first, matrix_dimensions.second);
         cl_program program = clCreateProgramWithSource(context, 1, 
                 (const char **)&kernel_as_c_string, (const size_t *)&size_of_program, &ret);
         CHECK_RET
