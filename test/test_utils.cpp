@@ -1,6 +1,6 @@
 #include <utils.h>
 using utils::test;
-#define NUMBER_OF_THREADS 8
+#define NUMBER_OF_THREADS 1
 #include <sample.h>
 #include <classification_tree_node_opencl.h>
 #include <online_random_forest_classifier.h>
@@ -246,6 +246,7 @@ void test_online_random_forest(){
   cout<<"Test correct percentage:"<<correct/total<<endl;
 
   
+  cout<<"Starting to update restored rf.."<<endl;
   data=read_svm_data<float>("../../data/dna.scale.tr");
   //feeding the other half of training data
   for(;data_index<total;data_index++){
