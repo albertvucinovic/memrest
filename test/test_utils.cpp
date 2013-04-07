@@ -151,7 +151,7 @@ void test_argmax_vector(){
 
 void test_online_random_forest(){
   cout<<"Learning:"<<endl;
-  vector<shared_ptr<Sample<float>>> data=read_svm_data<float>("../../data/dna.scale.tr");
+  vector<shared_ptr<Sample<float>>> data=read_svm_data<float>("data/dna/dna.scale.tr");
   shared_ptr<Sample<float>> first_data=*(data.begin());
   int num_features=first_data->features.size();
   OnlineRandomForestClassifier<float, ClassificationTreeNodeOpenCL<float>> rf(
@@ -185,7 +185,7 @@ void test_online_random_forest(){
   cout<<"Training correct percentage:"<<correct/total<<endl;
 
   cout<<"Predicting test .."<<endl;
-  data=read_svm_data<float>("../../data/dna.scale.t");
+  data=read_svm_data<float>("data/dna/dna.scale.t");
   total=data.size();
   predictions.clear();
   correct=0;
@@ -216,7 +216,7 @@ void test_online_random_forest(){
 
   //TODO: test with the test set
   cout<<"Predicting training .."<<endl;
-  data=read_svm_data<float>("../../data/dna.scale.tr");
+  data=read_svm_data<float>("data/dna/dna.scale.tr");
   predictions.clear();
   correct=0.;
   total=data.size();
@@ -231,7 +231,7 @@ void test_online_random_forest(){
   cout<<"Training correct percentage:"<<correct/total<<endl;
 
   cout<<"Predicting test .."<<endl;
-  data=read_svm_data<float>("../../data/dna.scale.t");
+  data=read_svm_data<float>("data/dna/dna.scale.t");
   total=data.size();
   predictions.clear();
   correct=0;
@@ -247,7 +247,7 @@ void test_online_random_forest(){
 
   
   cout<<"Starting to update restored rf.."<<endl;
-  data=read_svm_data<float>("../../data/dna.scale.tr");
+  data=read_svm_data<float>("data/dna/dna.scale.tr");
   //feeding the other half of training data
   for(;data_index<total;data_index++){
   //  utils::print((*i)->features);
@@ -270,7 +270,7 @@ void test_online_random_forest(){
   cout<<"Training correct percentage:"<<correct/total<<endl;
 
   cout<<"Predicting test .."<<endl;
-  data=read_svm_data<float>("../../data/dna.scale.t");
+  data=read_svm_data<float>("data/dna/dna.scale.t");
   total=data.size();
   predictions.clear();
   correct=0;
