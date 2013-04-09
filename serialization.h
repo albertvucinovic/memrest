@@ -157,6 +157,9 @@ void save(Archive& ar, const OnlineRandomForestClassifier<T, NodeType>& forest, 
   ar << forest.max_tree_depth;
   
   ar << forest.trees;
+
+  ar << forest.number_of_immature_trees;
+  ar << forest.number_of_samples_to_be_mature;
 }
 
 template<typename  Archive, class T, class NodeType>
@@ -169,6 +172,9 @@ void load(Archive& ar, OnlineRandomForestClassifier<T, NodeType>& forest, const 
   ar >> forest.max_tree_depth;
   
   ar >> forest.trees;
+
+  ar >> forest.number_of_immature_trees;
+  ar >> forest.number_of_samples_to_be_mature;
 
   forest.parallel_queue=new lambda_queue(NUMBER_OF_THREADS, forest.number_of_trees);
 }

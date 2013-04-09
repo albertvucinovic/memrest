@@ -8,7 +8,8 @@ struct oob_error{
   oob_error(){}
   oob_error(T a, T c):oob_absolute_error(a), oob_samples_count(c){}
   T error(){
-    return oob_absolute_error/oob_samples_count;
+    //the +1 is because of the division by zero
+    return (oob_absolute_error+1)/(oob_samples_count+1);
   }
 };
 
