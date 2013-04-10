@@ -1,4 +1,4 @@
-Create A OnlineRandomForestClassifier class with bad oob error tree droping.
+Create the possibility to use 'mini batch' learning.
 
 ###REGRESSION###
 Create RegressionTreeNode class.
