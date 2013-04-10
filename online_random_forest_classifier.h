@@ -52,14 +52,16 @@ class OnlineRandomForestClassifier{
     int number_of_decision_functions,
     int min_samples_to_split,
     int max_samples_to_hold,
-    int max_tree_depth
+    int max_tree_depth,
+    int number_of_samples_to_be_mature=NUMBER_OF_SAMPLES_TO_BE_MATURE
   ):
     number_of_trees(number_of_trees),
     number_of_features(number_of_features),
     number_of_decision_functions(number_of_decision_functions),
     min_samples_to_split(min_samples_to_split),
     max_samples_to_hold(max_samples_to_hold),
-    max_tree_depth(max_tree_depth)
+    max_tree_depth(max_tree_depth),
+    number_of_samples_to_be_mature(number_of_samples_to_be_mature)
   {
     trees.reset(new vector<TreeNodeOOB>());
     for(int i=0;i<number_of_trees;i++){
@@ -79,7 +81,6 @@ class OnlineRandomForestClassifier{
     }
     parallel_queue=new lambda_queue(NUMBER_OF_THREADS,number_of_trees);
     number_of_immature_trees=number_of_trees/3;
-    number_of_samples_to_be_mature=NUMBER_OF_SAMPLES_TO_BE_MATURE;
   }
 
   ~OnlineRandomForestClassifier(){}
