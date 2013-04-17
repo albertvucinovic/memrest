@@ -18,6 +18,7 @@ using std::sort;
 #include <lambda_queue.h>
 
 #define NUMBER_OF_SAMPLES_TO_BE_MATURE 500
+#define FRACTION_OF_IMMATURE_TREES .3333
 
 
 template <class T, class NodeType>
@@ -53,7 +54,8 @@ class OnlineRandomForestClassifier{
     int min_samples_to_split,
     int max_samples_to_hold,
     int max_tree_depth,
-    int number_of_samples_to_be_mature=NUMBER_OF_SAMPLES_TO_BE_MATURE
+    int number_of_samples_to_be_mature=NUMBER_OF_SAMPLES_TO_BE_MATURE,
+    float fraction_of_immature_trees=FRACTION_OF_IMMATURE_TREES
   ):
     number_of_trees(number_of_trees),
     number_of_features(number_of_features),
@@ -80,7 +82,7 @@ class OnlineRandomForestClassifier{
         ));
     }
     parallel_queue=new lambda_queue(NUMBER_OF_THREADS,number_of_trees);
-    number_of_immature_trees=number_of_trees/3;
+    number_of_immature_trees=number_of_trees*fraction_of_immature_trees;
   }
 
   ~OnlineRandomForestClassifier(){}
