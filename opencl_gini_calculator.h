@@ -123,8 +123,8 @@ class OpenCLGiniCalculator{
       ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&gini_res_mem);
       CHECK_RET
 
-      const size_t global_work_size[]={num_features, num_samples};
-      const size_t local_work_size[]={1, num_samples};
+      const size_t global_work_size[]={(size_t)num_features, (size_t)num_samples};
+      const size_t local_work_size[]={1, (size_t)num_samples};
       cl_event kernel_event;
       ret = clEnqueueNDRangeKernel(this->command_queue, kernel, 2, NULL, 
         global_work_size, local_work_size, 0, NULL, &kernel_event);
