@@ -7,12 +7,6 @@
 #include <iostream>
 #include <memory>
 
-#ifdef BOOST_MEM
-#include <boost/shared_ptr.hpp>
-using boost::shared_ptr;
-#else
-using std::shared_ptr;
-#endif
 
 #include <vector>
 using std::vector;
