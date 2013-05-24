@@ -141,7 +141,7 @@ class OnlineRandomForestClassifier{
     std::sort(immature_trees.begin(), immature_trees.end(), c);
 
     //drop the worst mature tree
-    if(best_trees_sorted_by_oob->size()>=number_of_trees-number_of_immature_trees){
+    if(best_trees_sorted_by_oob->size()>number_of_trees-number_of_immature_trees){
       //we can drop the worst mature tree
       TreeNodeOOB worst_tree=best_trees_sorted_by_oob->back();
       cout<<"Dropping the tree with oob="<<worst_tree.second->error()<<endl;
