@@ -127,7 +127,7 @@ class OpenCLGiniCalculator{
       const size_t local_work_size[]={1, (size_t)num_samples};
       cl_event kernel_event;
       ret = clEnqueueNDRangeKernel(this->command_queue, kernel, 2, NULL, 
-        global_work_size, local_work_size, 0, NULL, &kernel_event);
+        global_work_size, NULL/*local_work_size*/, 0, NULL, &kernel_event);
       CHECK_RET
 
       shared_ptr<vector<T>> result(new vector<T>(num_features*num_samples));
@@ -201,18 +201,11 @@ void gini(
   __constant {{float_type}} *sample_classes, 
   __global {{float_type}} *gini_res)
 {
-  __local {{float_type}} A_local[LOCAL_MATRIX_SIZE];
-  __local {{float_type}} sample_classes_local[{{num_samples}}];
-
   unsigned int thread_feature = get_global_id(0);
   unsigned int thread_sample = get_global_id(1);
 
   int main_index=thread_sample*{{num_features}}+thread_feature;
 
-  A_local[thread_sample]=A[main_index];
-  sample_classes_local[thread_sample]=sample_classes[thread_sample];
-
-  barrier(CLK_LOCAL_MEM_FENCE);
   int my_classes_counts[{{num_samples}}];
   int classes_counts[{{num_samples}}*2];
   //initializing classes counts
@@ -225,7 +218,7 @@ void gini(
   }
   //classes counts before the split
   for(int i=0; i<{{num_samples}}; i++){
-    int k=sample_classes_local[i];
+    int k=sample_classes[i];
     int hashed_index=hash(k);
     my_classes_counts[hashed_index]++;
   }
@@ -233,15 +226,15 @@ void gini(
   //We now classify the samples acording to threshold
   //We get left and right classes counts after split
   //TODO: probably would be more efficient if A_local would be transposed
-  {{float_type}} threshold = A_local[thread_sample];
+  {{float_type}} threshold = A[main_index];
   {{float_type}} left_total=0.;
   {{float_type}} right_total=0.;
   for(int i=0; i<{{num_samples}}; i++){
     //int index=i*{{num_features}}+thread_feature;
-    int k=sample_classes_local[i];
+    int k=sample_classes[i];
     int hashed_index=hash(k);
     //A_local[index]>threshold returns a 0 or 1, so it increments the index for the right class
-    int cl=(A_local[i]>threshold);
+    int cl=(A[i*{{num_features}}+thread_feature]>threshold);
     right_total=right_total+({{float_type}})cl;
     left_total=left_total+(1-({{float_type}})cl);
     classes_counts[2*hashed_index+cl]++;
