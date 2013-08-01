@@ -11,6 +11,7 @@
 
 #include <CL/cl.h>
 
+
 using std::string;
 using std::map;
 using std::pair;
@@ -80,6 +81,7 @@ class OpenCLGiniCalculator{
         ctemplate::TemplateDictionary dict("kernel");
         dict["prime"] = "4294967291";
         dict["float_type"]=this->float_type;
+
         dict["num_samples"] = to_string(num_samples);
         dict["num_features"]=to_string(num_features);
         std::string kernel_with_args;
@@ -160,9 +162,10 @@ class OpenCLGiniCalculator{
       platform_id = NULL;
       device_id = NULL;   
       ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-      ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_GPU, 1, 
-              &device_id, &ret_num_devices);
+      ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_GPU, 16, 
+              &(device_ids[0]), &ret_num_devices);
    
+      device_id=device_ids[OpenCLGiniCalculator::created%ret_num_devices];
       // Create an OpenCL context
       context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
    
@@ -173,6 +176,7 @@ class OpenCLGiniCalculator{
 
     
     cl_platform_id platform_id;
+    cl_device_id device_ids[16];
     cl_device_id device_id;
     cl_uint ret_num_devices;
     cl_uint ret_num_platforms;

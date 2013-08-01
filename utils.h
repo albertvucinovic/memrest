@@ -4,7 +4,7 @@
 #define DEBUG_LEVEL 0
 #define BOOST_MEM
 #define NUMBER_OF_THREADS 1
-#define NUMBER_OF_OPENCL_CONTEXTS 1
+#define NUMBER_OF_OPENCL_CONTEXTS 2
 
 #define TYPE "float"
 
